@@ -1,0 +1,11 @@
+[Steps to build] 
+1. Get the full AOSP source code from android open source site (http://source.android.com).
+   Our platform source code is based on the full AOSP source code build_id:OPR6.170623.013.
+
+2. Use the build command below to make sure your build environment could build the full AOSP source code.
+   command = ". build/envsetup.sh ; lunch aosp_arm64-user ; make -j8"
+
+3. Build individual software module of HTC's platform open source code.
+   3.1 Copy the kernel_header folder in HTC's platform open source archive to directory "out/target/product/generic_arm64/obj/KERNEL_OBJ/usr"
+   3.2 Copy the individaul software module you want to build from HTC's platform open source code archive to the full AOSP source code. If the software module is already in AOSP's source code, please remove AOSP's corresponding software module first.
+   3.3 Change the working directory to the module you want to build, then use command "mma" to build the software module.
