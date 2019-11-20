@@ -8,6 +8,6 @@ some oem/odm android kernel source code
 * oneplus: https://github.com/OnePlusOSS/android_kernel_oneplus_msm8998
 * oppo: -
 * vivo: -
-* mtk: -
+* mtk: https://github.com/alexhe/Kernel_MTK_MT6582
 * qcom: -
-*  meizu: -
+* meizu: -
