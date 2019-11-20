@@ -2,7 +2,7 @@
 some oem/odm android kernel source code
 
 * huawei:
-* htc: 
+* htc: https://www.htcdev.com/devcenter/downloads
 * samsung: https://opensource.samsung.com/uploadList?menuItem=mobile&classification1=mobile_phone
 * xiaomi: https://github.com/MiCode/Xiaomi_Kernel_OpenSource
 * oneplus: https://github.com/OnePlusOSS/android_kernel_oneplus_msm8998
