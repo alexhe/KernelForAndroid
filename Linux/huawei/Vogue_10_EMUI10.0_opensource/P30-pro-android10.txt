@@ -1,0 +1,6 @@
+VOG--EMUI10.0	HUAWEI P30 Pro,VOGUE,EMUI10.0,Android 10
+
+https://consumer.huawei.com/en/opensource/detail/
+
+http://download-c1.huawei.com/download/downloadCenter?downloadId=101116&version=439050&siteCode=worldwide
+
