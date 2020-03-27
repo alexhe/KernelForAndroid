@@ -4,6 +4,8 @@ export chip_type :=
 export CFG_PLATFORM := kirin980
 export OBB_PRODUCT_NAME := kirin980
 export TARGET_BOARD_PLATFORM := kirin980
+
+# helin: kernel 版本号
 VERSION = 4
 PATCHLEVEL = 14
 SUBLEVEL = 116

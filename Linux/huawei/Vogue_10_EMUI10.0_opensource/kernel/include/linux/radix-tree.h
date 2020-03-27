@@ -101,15 +101,15 @@ struct radix_tree_node {
 		struct list_head private_list;	/* For tree user */
 		struct rcu_head	rcu_head;	/* Used when freeing node */
 	};
-	void __rcu	*slots[RADIX_TREE_MAP_SIZE];
-	unsigned long	tags[RADIX_TREE_MAX_TAGS][RADIX_TREE_TAG_LONGS];
+	void __rcu	*slots[RADIX_TREE_MAP_SIZE]; //helin: slot数组长度 2**6= 64
+	unsigned long	tags[RADIX_TREE_MAX_TAGS][RADIX_TREE_TAG_LONGS]; //helin: tag标记，快速查找脏页等
 };
 
 /* The top bits of gfp_mask are used to store the root tags and the IDR flag */
 #define ROOT_IS_IDR	((__force gfp_t)(1 << __GFP_BITS_SHIFT))
 #define ROOT_TAG_SHIFT	(__GFP_BITS_SHIFT + 1)
 
-struct radix_tree_root {
+struct radix_tree_root { //helin
 	gfp_t			gfp_mask;
 	struct radix_tree_node	__rcu *rnode;
 };

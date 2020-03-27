@@ -53,7 +53,7 @@ struct mapping_stat_t {
  * hash comes first so it snuggles against d_parent in the
  * dentry.
  */
-struct qstr {
+struct qstr { //helin: qstr定义, 包含len和char*
 	union {
 		struct {
 			HASH_LEN_DECLARE;
@@ -96,7 +96,7 @@ extern struct dentry_stat_t dentry_stat;
 
 #define d_lock	d_lockref.lock
 
-struct dentry {
+struct dentry { //helin: dentry定义
 	/* RCU lookup touched fields */
 	unsigned int d_flags;		/* protected by d_lock */
 	seqcount_t d_seq;		/* per dentry seqlock */
@@ -105,7 +105,7 @@ struct dentry {
 	struct qstr d_name;
 	struct inode *d_inode;		/* Where the name belongs to - NULL is
 					 * negative */
-	unsigned char d_iname[DNAME_INLINE_LEN];	/* small names */
+	unsigned char d_iname[DNAME_INLINE_LEN];	/* small names */ //helin: 主要是照顾64位 cacheline对齐
 
 	/* Ref lookup also touches following */
 	struct lockref d_lockref;	/* per-dentry lock and refcount */

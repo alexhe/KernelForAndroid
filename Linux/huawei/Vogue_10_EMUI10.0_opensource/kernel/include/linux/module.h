@@ -83,7 +83,7 @@ extern void cleanup_module(void);
  * builtin) or at module insertion time (if a module).  There can only
  * be one per module.
  */
-#define module_init(x)	__initcall(x);
+#define module_init(x)	__initcall(x); //helin
 
 /**
  * module_exit() - driver exit entry point

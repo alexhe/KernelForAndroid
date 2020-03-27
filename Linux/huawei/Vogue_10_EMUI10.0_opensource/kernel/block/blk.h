@@ -13,7 +13,7 @@
 #define BLK_BATCH_REQ	32
 
 /* Max future timer expiry for timeouts */
-#define BLK_MAX_TIMEOUT		(5 * HZ)
+#define BLK_MAX_TIMEOUT		(5 * HZ) //helin
 
 #ifdef CONFIG_DEBUG_FS
 extern struct dentry *blk_debugfs_root;

@@ -392,7 +392,7 @@ inline void __blk_run_queue_uncond(struct request_queue *q)
 	 * can wait until all these request_fn calls have finished.
 	 */
 	q->request_fn_active++;
-	q->request_fn(q);
+	q->request_fn(q);  //helin: 真正 读写等操作 物理磁盘等
 	q->request_fn_active--;
 }
 EXPORT_SYMBOL_GPL(__blk_run_queue_uncond);
@@ -1000,7 +1000,7 @@ blk_init_queue_node(request_fn_proc *rfn, spinlock_t *lock, int node_id)
 	if (!q)
 		return NULL;
 
-	q->request_fn = rfn;
+	q->request_fn = rfn; //helin
 	if (lock)
 		q->queue_lock = lock;
 	if (blk_init_allocated_queue(q) < 0) {
@@ -1038,7 +1038,7 @@ int blk_init_allocated_queue(struct request_queue *q)
 	/*
 	 * This also sets hw/phys segments, boundary and size
 	 */
-	blk_queue_make_request(q, blk_queue_bio);
+	blk_queue_make_request(q, blk_queue_bio); //helin: make_request_fn = blk_queue_bio
 
 	q->sg_reserved_size = INT_MAX;
 
@@ -1853,7 +1853,7 @@ void blk_init_request_from_bio(struct request *req, struct bio *bio)
 }
 EXPORT_SYMBOL_GPL(blk_init_request_from_bio);
 
-static blk_qc_t blk_queue_bio(struct request_queue *q, struct bio *bio)
+static blk_qc_t blk_queue_bio(struct request_queue *q, struct bio *bio) //helin: make_request_fn
 {
 	struct blk_plug *plug;
 	int where = ELEVATOR_INSERT_SORT;
@@ -1883,7 +1883,7 @@ static blk_qc_t blk_queue_bio(struct request_queue *q, struct bio *bio)
 	 * Check if we can merge with the plugged list before grabbing
 	 * any locks.
 	 */
-	if (!blk_queue_nomerges(q)) {
+	if (!blk_queue_nomerges(q)) { //helin: 不能合并
 		if (blk_attempt_plug_merge(q, bio, &request_count, NULL))
 			return BLK_QC_T_NONE; /*lint !e501*/
 	} else
@@ -1892,7 +1892,7 @@ static blk_qc_t blk_queue_bio(struct request_queue *q, struct bio *bio)
 	spin_lock_irq(q->queue_lock);
 
 	switch (elv_merge(q, &req, bio)) {
-	case ELEVATOR_BACK_MERGE:
+	case ELEVATOR_BACK_MERGE: //helin: 后向合并
 		if (!bio_attempt_back_merge(q, req, bio))
 			break;
 		elv_bio_merged(q, req, bio);
@@ -1902,7 +1902,7 @@ static blk_qc_t blk_queue_bio(struct request_queue *q, struct bio *bio)
 		else
 			elv_merged_request(q, req, ELEVATOR_BACK_MERGE);
 		goto out_unlock;
-	case ELEVATOR_FRONT_MERGE:
+	case ELEVATOR_FRONT_MERGE: //helin 前向合并
 		if (!bio_attempt_front_merge(q, req, bio))
 			break;
 		elv_bio_merged(q, req, bio);
@@ -1951,13 +1951,13 @@ get_rq:
 	 * We don't worry about that case for efficiency. It won't happen
 	 * often, and the elevators are able to handle it.
 	 */
-	blk_init_request_from_bio(req, bio);
+	blk_init_request_from_bio(req, bio); //helin:
 
 	if (test_bit(QUEUE_FLAG_SAME_COMP, &q->queue_flags))
 		req->cpu = raw_smp_processor_id();
 
 	plug = current->plug;
-	if (plug) {
+	if (plug) { //helin: 空闲状态 or  插入状态
 		/*
 		 * If this is the first request added after a plug, fire
 		 * of a plug trace.
@@ -1975,12 +1975,12 @@ get_rq:
 				trace_block_plug(q);
 			}
 		}
-		list_add_tail(&req->queuelist, &plug->list);
+		list_add_tail(&req->queuelist, &plug->list); //helin: 插入状态
 		blk_account_io_start(req, true);
 	} else {
 		spin_lock_irq(q->queue_lock);
 		add_acct_request(q, req, where);
-		__blk_run_queue(q);
+		__blk_run_queue(q); //helin: 空闲状态
 out_unlock:
 		spin_unlock_irq(q->queue_lock);
 	}
@@ -2201,7 +2201,7 @@ generic_make_request_checks(struct bio *bio)
 		}
 	}
 
-	switch (bio_op(bio)) {
+	switch (bio_op(bio)) { //helin: bio operator type
 	case REQ_OP_DISCARD:
 		if (!blk_queue_discard(q))
 			goto not_supported;
@@ -2323,7 +2323,7 @@ blk_qc_t generic_make_request(struct bio *bio)
 	}
 #endif
 
-	if (!generic_make_request_checks(bio))
+	if (!generic_make_request_checks(bio)) //helin
 		goto out;
 
 	/*
@@ -2370,7 +2370,7 @@ blk_qc_t generic_make_request(struct bio *bio)
 #ifdef CONFIG_HISI_BLK
 			hisi_blk_generic_make_request(bio);
 #endif
-			ret = q->make_request_fn(q, bio);
+			ret = q->make_request_fn(q, bio); //helin: 创建requet
 
 			blk_queue_exit(q);
 
@@ -2420,7 +2420,7 @@ blk_qc_t submit_bio(struct bio *bio)
 
 	bio_get(bio);
 	if (bio->bi_disk)
-		trace_block_submit_bio(bio, 1);
+		trace_block_submit_bio(bio, 1); //helin: block.h # enter = 1
 #endif
 
 	/*
@@ -2436,13 +2436,13 @@ blk_qc_t submit_bio(struct bio *bio)
 			count = bio_sectors(bio);
 
 		if (op_is_write(bio_op(bio))) {
-			count_vm_events(PGPGOUT, count);
+			count_vm_events(PGPGOUT, count); //helin: write - page out
 		} else {
-			task_io_account_read(bio->bi_iter.bi_size);
+			task_io_account_read(bio->bi_iter.bi_size); //helin: read - page in
 			count_vm_events(PGPGIN, count);
 		}
 
-		if (unlikely(block_dump)) {
+		if (unlikely(block_dump)) { //helin: dump log
 			char b[BDEVNAME_SIZE];
 			printk(KERN_DEBUG "%s(%d): %s block %Lu on %s (%u sectors)\n", /*lint !e566*/
 			current->comm, task_pid_nr(current),
@@ -2455,7 +2455,7 @@ blk_qc_t submit_bio(struct bio *bio)
 #ifdef CONFIG_HISI_IO_TRACE
 	ret = generic_make_request(bio);
 	if (bio->bi_disk)
-		trace_block_submit_bio(bio, 0);
+		trace_block_submit_bio(bio, 0); //helin: block.h # enter = 0
 	bio_put(bio);
 	return ret;
 #else

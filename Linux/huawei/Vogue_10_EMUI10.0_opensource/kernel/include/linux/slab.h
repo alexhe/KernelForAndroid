@@ -229,7 +229,7 @@ static inline const char *__check_heap_object(const void *ptr,
 				(MAX_ORDER + PAGE_SHIFT - 1) : 25)
 #define KMALLOC_SHIFT_MAX	KMALLOC_SHIFT_HIGH
 #ifndef KMALLOC_SHIFT_LOW
-#define KMALLOC_SHIFT_LOW	5
+#define KMALLOC_SHIFT_LOW	5 //helin: slab: 32 Byte开始
 #endif
 #endif
 
@@ -241,7 +241,7 @@ static inline const char *__check_heap_object(const void *ptr,
 #define KMALLOC_SHIFT_HIGH	(PAGE_SHIFT + 1)
 #define KMALLOC_SHIFT_MAX	(MAX_ORDER + PAGE_SHIFT - 1)
 #ifndef KMALLOC_SHIFT_LOW
-#define KMALLOC_SHIFT_LOW	3
+#define KMALLOC_SHIFT_LOW	3 //helin: slub: 8 Byte开始
 #endif
 #endif
 
@@ -254,7 +254,7 @@ static inline const char *__check_heap_object(const void *ptr,
 #define KMALLOC_SHIFT_HIGH	PAGE_SHIFT
 #define KMALLOC_SHIFT_MAX	(MAX_ORDER + PAGE_SHIFT - 1)
 #ifndef KMALLOC_SHIFT_LOW
-#define KMALLOC_SHIFT_LOW	3
+#define KMALLOC_SHIFT_LOW	3 //helin: slob: 8 Byte开始
 #endif
 #endif
 
@@ -500,7 +500,7 @@ static __always_inline void *kmalloc_large(size_t size, gfp_t flags)
  * for general use, and so are not documented here. For a full list of
  * potential flags, always refer to linux/gfp.h.
  */
-static __always_inline void *kmalloc(size_t size, gfp_t flags)
+static __always_inline void *kmalloc(size_t size, gfp_t flags) //helin： kmalloc
 {
 	if (__builtin_constant_p(size)) {
 		if (size > KMALLOC_MAX_CACHE_SIZE)

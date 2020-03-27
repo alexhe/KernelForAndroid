@@ -858,7 +858,7 @@ struct rtg_class {
 };
 #endif
 
-struct task_struct {
+struct task_struct { //helin 2020-03-15
 #ifdef CONFIG_THREAD_INFO_IN_TASK
 	/*
 	 * For reasons of header soup (see current_thread_info()), this
@@ -990,11 +990,11 @@ struct task_struct {
 	struct rb_node			pushable_dl_tasks;
 #endif
 
-	struct mm_struct		*mm;
-	struct mm_struct		*active_mm;
+	struct mm_struct		*mm; //helin
+	struct mm_struct		*active_mm; //helin
 
 	/* Per-thread vma caching: */
-	struct vmacache			vmacache;
+	struct vmacache			vmacache; //helin: 线程vma 缓存
 
 #ifdef SPLIT_RSS_COUNTING
 	struct task_rss_stat		rss_stat;
@@ -1167,10 +1167,10 @@ struct task_struct {
 	unsigned long			last_switch_count;
 #endif
 	/* Filesystem information: */
-	struct fs_struct		*fs;
+	struct fs_struct		*fs; //helin
 
 	/* Open file information: */
-	struct files_struct		*files;
+	struct files_struct		*files; //helin
 
 	/* Namespaces: */
 	struct nsproxy			*nsproxy;

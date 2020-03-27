@@ -1014,7 +1014,7 @@ long nr_blockdev_pages(void)
 	long ret = 0;
 	spin_lock(&bdev_lock);
 	list_for_each_entry(bdev, &all_bdevs, bd_list) {
-		ret += bdev->bd_inode->i_mapping->nrpages;
+		ret += bdev->bd_inode->i_mapping->nrpages; //helin: 遍历block dev，获取block dev的inode 映射的所有pages数量的总和
 	}
 	spin_unlock(&bdev_lock);
 	return ret;

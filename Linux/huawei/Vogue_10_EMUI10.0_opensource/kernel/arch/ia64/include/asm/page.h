@@ -102,7 +102,7 @@ extern int ia64_pfn_valid (unsigned long pfn);
 #endif
 
 #ifdef CONFIG_VIRTUAL_MEM_MAP
-extern struct page *vmem_map;
+extern struct page *vmem_map; //helin: 和 mem_page什么区别
 #ifdef CONFIG_DISCONTIGMEM
 # define page_to_pfn(page)	((unsigned long) (page - vmem_map))
 # define pfn_to_page(pfn)	(vmem_map + (pfn))

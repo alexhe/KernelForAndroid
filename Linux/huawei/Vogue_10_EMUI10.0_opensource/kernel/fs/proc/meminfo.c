@@ -60,8 +60,8 @@ static int meminfo_proc_show(struct seq_file *m, void *v)
 	unsigned long pages[NR_LRU_LISTS];
 	int lru;
 
-	si_meminfo(&i);
-	si_swapinfo(&i);
+	si_meminfo(&i); //helin: 包括获取了block dev的 inode 映射的page总数
+	si_swapinfo(&i); //helin: 获取swap空间总数和剩余可用数量
 	committed = percpu_counter_read_positive(&vm_committed_as);
 
 	cached = global_node_page_state(NR_FILE_PAGES) -
@@ -77,8 +77,8 @@ static int meminfo_proc_show(struct seq_file *m, void *v)
 	show_val_kb(m, "MemTotal:       ", i.totalram);
 	show_val_kb(m, "MemFree:        ", i.freeram);
 	show_val_kb(m, "MemAvailable:   ", available);
-	show_val_kb(m, "Buffers:        ", i.bufferram);
-	show_val_kb(m, "Cached:         ", cached);
+	show_val_kb(m, "Buffers:        ", i.bufferram); //helin: buffer cache vs page cache
+	show_val_kb(m, "Cached:         ", cached); //helin: buffer cache vs page cache
 	show_val_kb(m, "SwapCached:     ", total_swapcache_pages());
 	show_val_kb(m, "Active:         ", pages[LRU_ACTIVE_ANON] +
 					   pages[LRU_ACTIVE_FILE]);
@@ -204,7 +204,7 @@ static const struct file_operations meminfo_proc_fops = {
 
 static int __init proc_meminfo_init(void)
 {
-	proc_create("meminfo", 0, NULL, &meminfo_proc_fops);
+	proc_create("meminfo", 0, NULL, &meminfo_proc_fops); //helin: /proc/meminfo
 	return 0;
 }
 fs_initcall(proc_meminfo_init);

@@ -365,7 +365,7 @@ static __always_inline unsigned long msecs_to_jiffies(const unsigned int m)
 	if (__builtin_constant_p(m)) {
 		if ((int)m < 0)
 			return MAX_JIFFY_OFFSET;
-		return _msecs_to_jiffies(m);
+		return _msecs_to_jiffies(m); //helin:  1个jiffies 等于 1000/HZ 毫秒
 	} else {
 		return __msecs_to_jiffies(m);
 	}

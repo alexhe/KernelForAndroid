@@ -8,8 +8,8 @@
  * Definitions unique to the original Linux SLAB allocator.
  */
 
-struct kmem_cache {
-	struct array_cache __percpu *cpu_cache;
+struct kmem_cache { //helin
+	struct array_cache __percpu *cpu_cache; //helin: cpu缓存
 
 /* 1) Cache tunables. Protected by slab_mutex */
 	unsigned int batchcount;
@@ -36,10 +36,10 @@ struct kmem_cache {
 	unsigned int freelist_size;
 
 	/* constructor func */
-	void (*ctor)(void *obj);
+	void (*ctor)(void *obj); //helin. 构造函数
 
 /* 4) cache creation/removal */
-	const char *name;
+	const char *name; //helin: sysfs显示的名字
 	struct list_head list;
 	int refcount;
 	int object_size;
@@ -85,7 +85,7 @@ struct kmem_cache {
 	unsigned int *random_seq;
 #endif
 
-	struct kmem_cache_node *node[MAX_NUMNODES];
+	struct kmem_cache_node *node[MAX_NUMNODES]; //helin: node cache
 };
 
 static inline void *nearest_obj(struct kmem_cache *cache, struct page *page,

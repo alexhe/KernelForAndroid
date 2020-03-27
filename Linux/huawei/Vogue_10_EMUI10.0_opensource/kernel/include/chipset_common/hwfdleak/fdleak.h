@@ -25,13 +25,13 @@
 extern "C" {
 #endif
 
-#define MAX_FDLEAK_PID_NUM 5
+#define MAX_FDLEAK_PID_NUM 5 //helin: 系统同时跟踪泄漏pid的最大次数值
 #define MAX_PROBE_COUNT 3
-#define MAX_STACK_TRACE_COUNT 20
-#define FDLEAK_MAX_STACK_TRACE_DEPTH 64
+#define MAX_STACK_TRACE_COUNT 20  //helin: fd leak 的 跟踪backtrace 最大总数
+#define FDLEAK_MAX_STACK_TRACE_DEPTH 64 //helin: fd leak 的 backtrace 深度
 #define MAX_FDLEAK_WP_NAME_LEN 256
 
-enum fdleak_wp_id {
+enum fdleak_wp_id { //helin: fd leak 类型 
 	FDLEAK_WP_MIN = 0,
 	FDLEAK_WP_EVENTFD = 0,
 	FDLEAK_WP_EVENTPOLL = 1,
@@ -85,7 +85,7 @@ struct fdleak_stackinfo {
 /* the following are used for IOCTL */
 #define FDLEAK_MAGIC 0x5366FEFA
 #define FDLEAK_CMD_INVALID 0xFF
-
+//helin: ioctl 控制 fd leak 监控的 开关和堆栈获取
 #define __FDLEAKIO  0xAC
 #define FDLEAK_ENABLE_WATCH     _IO(__FDLEAKIO, 1)
 #define FDLEAK_DISABLE_WATCH    _IO(__FDLEAKIO, 2)

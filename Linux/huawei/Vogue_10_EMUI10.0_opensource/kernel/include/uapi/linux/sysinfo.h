@@ -11,9 +11,11 @@ struct sysinfo {
 	__kernel_ulong_t totalram;	/* Total usable main memory size */
 	__kernel_ulong_t freeram;	/* Available memory size */
 	__kernel_ulong_t sharedram;	/* Amount of shared memory */
-	__kernel_ulong_t bufferram;	/* Memory used by buffers */
+	__kernel_ulong_t bufferram;	/* Memory used by buffers */ //helin: buffer cache
+
 	__kernel_ulong_t totalswap;	/* Total swap space size */
 	__kernel_ulong_t freeswap;	/* swap space still available */
+	
 	__u16 procs;		   	/* Number of current processes */
 	__u16 pad;		   	/* Explicit padding for m68k */
 	__kernel_ulong_t totalhigh;	/* Total high memory size */

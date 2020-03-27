@@ -49,6 +49,7 @@ void activity_stats_update(void)
 		/*
 		 * Check if the time delta between network activity is within the
 		 * minimum bucket range.
+		 * 1000000000ULL = 1s
 		 */
 		if (delta < (1000000000ULL << i))
 			continue;

@@ -27,7 +27,7 @@ struct module;
 struct bin_attribute;
 enum kobj_ns_type;
 
-struct attribute {
+struct attribute { //helin: sysfs kobj attr使用
 	const char		*name;
 	umode_t			mode;
 #ifdef CONFIG_DEBUG_LOCK_ALLOC

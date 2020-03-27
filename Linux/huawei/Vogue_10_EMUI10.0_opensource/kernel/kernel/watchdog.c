@@ -318,7 +318,7 @@ notrace void touch_softlockup_watchdog(void)
 }
 EXPORT_SYMBOL(touch_softlockup_watchdog);
 
-void touch_all_softlockup_watchdogs(void)
+void touch_all_softlockup_watchdogs(void) //helin
 {
 	int cpu;
 

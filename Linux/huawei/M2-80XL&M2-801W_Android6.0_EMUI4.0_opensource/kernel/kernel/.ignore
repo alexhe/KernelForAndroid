@@ -1,0 +1,4 @@
+drivers/media/
+arch/arm64/boot/dts/auto-generate
+drivers/video/
+drivers/huawei_platform/connectivity/

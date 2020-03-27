@@ -27,7 +27,7 @@
 #include "slab.h"
 
 enum slab_state slab_state;
-LIST_HEAD(slab_caches);
+LIST_HEAD(slab_caches); //helin: cache chain， 所有的kmem_cache 都加入 作为root的 slab_caches这个链表
 DEFINE_MUTEX(slab_mutex);
 struct kmem_cache *kmem_cache;
 
@@ -382,7 +382,7 @@ static struct kmem_cache *create_cache(const char *name,
 	int err;
 
 	err = -ENOMEM;
-	s = kmem_cache_zalloc(kmem_cache, GFP_KERNEL);
+	s = kmem_cache_zalloc(kmem_cache, GFP_KERNEL); //helin: 分配kmem_cache结构体空间
 	if (!s)
 		goto out;
 
@@ -480,7 +480,7 @@ kmem_cache_create(const char *name, size_t size, size_t align,
 		err = -ENOMEM;
 		goto out_unlock;
 	}
-
+	//helin: 创建name的cache
 	s = create_cache(cache_name, size, size,
 			 calculate_alignment(flags, align, size),
 			 flags, ctor, NULL, NULL);
@@ -926,7 +926,7 @@ struct kmem_cache *__init create_kmalloc_cache(const char *name, size_t size,
 	return s;
 }
 
-struct kmem_cache *kmalloc_caches[KMALLOC_SHIFT_HIGH + 1];
+struct kmem_cache *kmalloc_caches[KMALLOC_SHIFT_HIGH + 1]; //helin: kmalloc_caches
 EXPORT_SYMBOL(kmalloc_caches);
 
 #ifdef CONFIG_ZONE_DMA
@@ -1006,7 +1006,8 @@ struct kmem_cache *kmalloc_slab(size_t size, gfp_t flags)
  * kmalloc_index() supports up to 2^26=64MB, so the final entry of the table is
  * kmalloc-67108864.
  */
-const struct kmalloc_info_struct kmalloc_info[] __initconst = {
+//helin: slab 从32字节开始； slob 和 slub从8字节开始；根据index ，计算大小；从数组第3项 8字节开始，2^index = size
+const struct kmalloc_info_struct kmalloc_info[] __initconst = { //helin
 	{NULL,                      0},		{"kmalloc-96",             96},
 	{"kmalloc-192",           192},		{"kmalloc-8",               8},
 	{"kmalloc-16",             16},		{"kmalloc-32",             32},
@@ -1020,7 +1021,7 @@ const struct kmalloc_info_struct kmalloc_info[] __initconst = {
 	{"kmalloc-1048576",   1048576},		{"kmalloc-2097152",   2097152},
 	{"kmalloc-4194304",   4194304},		{"kmalloc-8388608",   8388608},
 	{"kmalloc-16777216", 16777216},		{"kmalloc-33554432", 33554432},
-	{"kmalloc-67108864", 67108864}
+	{"kmalloc-67108864", 67108864} //helin: 64MB
 };
 
 /*
@@ -1072,7 +1073,7 @@ void __init setup_kmalloc_cache_index_table(void)
 
 static void __init new_kmalloc_cache(int idx, unsigned long flags)
 {
-	kmalloc_caches[idx] = create_kmalloc_cache(kmalloc_info[idx].name,
+	kmalloc_caches[idx] = create_kmalloc_cache(kmalloc_info[idx].name, //helin
 					kmalloc_info[idx].size, flags);
 }
 
@@ -1081,10 +1082,10 @@ static void __init new_kmalloc_cache(int idx, unsigned long flags)
  * may already have been created because they were needed to
  * enable allocations for slab creation.
  */
-void __init create_kmalloc_caches(unsigned long flags)
+void __init create_kmalloc_caches(unsigned long flags) //helin: kmalloc_caches 数组 初始化
 {
 	int i;
-
+	//helin: 从8或32字节开始
 	for (i = KMALLOC_SHIFT_LOW; i <= KMALLOC_SHIFT_HIGH; i++) {
 		if (!kmalloc_caches[i])
 			new_kmalloc_cache(i, flags);
@@ -1095,9 +1096,9 @@ void __init create_kmalloc_caches(unsigned long flags)
 		 * earlier power of two caches
 		 */
 		if (KMALLOC_MIN_SIZE <= 32 && !kmalloc_caches[1] && i == 6)
-			new_kmalloc_cache(1, flags);
+			new_kmalloc_cache(1, flags); //helin: size = 96 bytes
 		if (KMALLOC_MIN_SIZE <= 64 && !kmalloc_caches[2] && i == 7)
-			new_kmalloc_cache(2, flags);
+			new_kmalloc_cache(2, flags); //helin: size = 196 bytes
 	}
 
 	/* Kmalloc array is now usable */
@@ -1365,7 +1366,7 @@ static const struct file_operations proc_slabinfo_operations = {
 
 static int __init slab_proc_init(void)
 {
-	proc_create("slabinfo", SLABINFO_RIGHTS, NULL,
+	proc_create("slabinfo", SLABINFO_RIGHTS, NULL,  //helin: 创建 /proc/slabinfo
 						&proc_slabinfo_operations);
 	return 0;
 }

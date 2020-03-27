@@ -156,7 +156,7 @@ TRACE_EVENT(binder_transaction,
 		  __entry->reply, __entry->flags, __entry->code)
 );
 
-TRACE_EVENT(binder_transaction_received,
+TRACE_EVENT(binder_transaction_received, //helin: 定义binder的trace
 	TP_PROTO(struct binder_transaction *t),
 	TP_ARGS(t),
 

@@ -639,7 +639,7 @@ TRACE_EVENT(block_rq_remap,
 		  (unsigned long long)__entry->old_sector, __entry->nr_bios)
 );
 
-#ifdef CONFIG_HISI_IO_TRACE
+#ifdef CONFIG_HISI_IO_TRACE //helin: hisi io trace
 #define HISI_IO_TRACE_BUF_LEN   128
 TRACE_EVENT(hisi_io,  /* [false alarm]:debug code  */
 
@@ -659,7 +659,7 @@ TRACE_EVENT(hisi_io,  /* [false alarm]:debug code  */
 
 	TP_printk("[%s]:%s", __get_str(info_func), __get_str(info_string)));
 
-TRACE_EVENT(block_submit_bio,  /* [false alarm]:debug code  */
+TRACE_EVENT(block_submit_bio,  /* [false alarm]:debug code  */ //helin: blk-core.c@submit_bio() 
 
 	TP_PROTO(struct bio *bio, int enter),
 

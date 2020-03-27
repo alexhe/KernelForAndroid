@@ -20,7 +20,7 @@ struct pglist_data *first_online_pgdat(void)
 
 struct pglist_data *next_online_pgdat(struct pglist_data *pgdat)
 {
-	int nid = next_online_node(pgdat->node_id);
+	int nid = next_online_node(pgdat->node_id); //helin
 
 	if (nid == MAX_NUMNODES)
 		return NULL;

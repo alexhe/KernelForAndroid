@@ -100,7 +100,7 @@ int sysctl_speculative_page_fault;
 unsigned long max_mapnr;
 EXPORT_SYMBOL(max_mapnr);
 
-struct page *mem_map;
+struct page *mem_map; //helin: 物理内存页映射数组。 还没找到哪里赋值的
 EXPORT_SYMBOL(mem_map);
 #endif
 
@@ -864,7 +864,7 @@ struct page *_vm_normal_page(struct vm_area_struct *vma, unsigned long addr,
 			     pte_t pte, bool with_public_device)
 #endif
 {
-	unsigned long pfn = pte_pfn(pte);
+	unsigned long pfn = pte_pfn(pte); //helin: pte 获取pfn 
 
 	if (HAVE_PTE_SPECIAL) {
 		if (likely(!pte_special(pte)))
@@ -893,7 +893,7 @@ struct page *_vm_normal_page(struct vm_area_struct *vma, unsigned long addr,
 		 * call site of vm_normal_page().
 		 */
 		if (likely(pfn <= highest_memmap_pfn)) {
-			struct page *page = pfn_to_page(pfn);
+			struct page *page = pfn_to_page(pfn); //helin: pfg 转 物理页
 
 			if (is_device_public_page(page)) {
 				if (with_public_device)
@@ -943,7 +943,7 @@ check_pfn:
 	 * eg. VDSO mappings can cause them to exist.
 	 */
 out:
-	return pfn_to_page(pfn);
+	return pfn_to_page(pfn); //helin: pfn 转 物理页
 }
 
 #ifdef CONFIG_TRANSPARENT_HUGEPAGE
@@ -4322,7 +4322,7 @@ static int do_shared_fault(struct vm_fault *vmf)
  * The mmap_sem may have been released depending on flags and our
  * return value.  See filemap_fault() and __lock_page_or_retry().
  */
-static int do_fault(struct vm_fault *vmf)
+static int do_fault(struct vm_fault *vmf) //helin
 {
 	struct vm_area_struct *vma = vmf->vma;
 	int ret;
@@ -4628,9 +4628,9 @@ static int handle_pte_fault(struct vm_fault *vmf)
 
 	if (!vmf->pte) {
 		if (vma_is_anonymous(vmf->vma))
-			return do_anonymous_page(vmf);
+			return do_anonymous_page(vmf); //helin: pys-ddr?
 		else
-			return do_fault(vmf);
+			return do_fault(vmf); //helin: 
 	}
 
 	if (!pte_present(vmf->orig_pte))
@@ -4681,7 +4681,7 @@ unlock:
  * The mmap_sem may have been released depending on flags and our
  * return value.  See filemap_fault() and __lock_page_or_retry().
  */
-static int __handle_mm_fault(struct vm_area_struct *vma, unsigned long address,
+static int __handle_mm_fault(struct vm_area_struct *vma, unsigned long address, //helin: mm falut缺页异常
 		unsigned int flags)
 {
 	struct vm_fault vmf = {
@@ -4702,11 +4702,11 @@ static int __handle_mm_fault(struct vm_area_struct *vma, unsigned long address,
 	int ret;
 
 	pgd = pgd_offset(mm, address);
-	p4d = p4d_alloc(mm, pgd, address);
+	p4d = p4d_alloc(mm, pgd, address); //helin: pgd
 	if (!p4d)
 		return VM_FAULT_OOM;
 
-	vmf.pud = pud_alloc(mm, p4d, address);
+	vmf.pud = pud_alloc(mm, p4d, address); //helin: pud
 	if (!vmf.pud)
 		return VM_FAULT_OOM;
 	if (pud_none(*vmf.pud) && transparent_hugepage_enabled(vma)) {
@@ -4732,7 +4732,7 @@ static int __handle_mm_fault(struct vm_area_struct *vma, unsigned long address,
 		}
 	}
 
-	vmf.pmd = pmd_alloc(mm, vmf.pud, address);
+	vmf.pmd = pmd_alloc(mm, vmf.pud, address); //helin: pmd
 	if (!vmf.pmd)
 		return VM_FAULT_OOM;
 #ifdef CONFIG_SPECULATIVE_PAGE_FAULT
@@ -4768,7 +4768,7 @@ static int __handle_mm_fault(struct vm_area_struct *vma, unsigned long address,
 		}
 	}
 
-	return handle_pte_fault(&vmf);
+	return handle_pte_fault(&vmf); //helin: pte falut 页表缺页异常处理
 }
 
 #ifdef CONFIG_SPECULATIVE_PAGE_FAULT
@@ -5050,7 +5050,7 @@ int __pud_alloc(struct mm_struct *mm, p4d_t *p4d, unsigned long address)
  * Allocate page middle directory.
  * We've already handled the fast-path in-line.
  */
-int __pmd_alloc(struct mm_struct *mm, pud_t *pud, unsigned long address)
+int __pmd_alloc(struct mm_struct *mm, pud_t *pud, unsigned long address) //helin: pmd alloc
 {
 	spinlock_t *ptl;
 	pmd_t *new = pmd_alloc_one(mm, address);

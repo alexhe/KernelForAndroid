@@ -37,7 +37,7 @@
 #define ICACHE_POLICY_PIPT	3
 
 #define L1_CACHE_SHIFT		6
-#define L1_CACHE_BYTES		(1 << L1_CACHE_SHIFT)
+#define L1_CACHE_BYTES		(1 << L1_CACHE_SHIFT) //helin: 2**6 = 32
 
 
 #define CLIDR_LOUU_SHIFT	27

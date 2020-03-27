@@ -542,7 +542,7 @@ struct octeon_device {
 	/* private flags to control driver-specific features through ethtool */
 	u32 priv_flags;
 
-	void *watchdog_task;
+	void *watchdog_task; //helin
 
 	u32 rx_coalesce_usecs;
 	u32 rx_max_coalesced_frames;

@@ -1327,7 +1327,7 @@ static inline struct page *_vm_normal_page(struct vm_area_struct *vma,
 				vma->vm_flags);
 }
 
-static inline struct page *vm_normal_page(struct vm_area_struct *vma,
+static inline struct page *vm_normal_page(struct vm_area_struct *vma, //helin: vm_normal_page: vaddr转换到物理页
 					  unsigned long addr, pte_t pte)
 {
 	return _vm_normal_page(vma, addr, pte, false);

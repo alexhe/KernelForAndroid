@@ -344,7 +344,7 @@ static void ext4_end_bio(struct bio *bio)
 	}
 }
 
-void ext4_io_submit(struct ext4_io_submit *io)
+void ext4_io_submit(struct ext4_io_submit *io) //helin: ext4: submit bio
 {
 	struct bio *bio = io->io_bio;
 

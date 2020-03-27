@@ -33,7 +33,7 @@
 
 static inline pmd_t *pmd_alloc_one(struct mm_struct *mm, unsigned long addr)
 {
-	return (pmd_t *)__get_free_page(PGALLOC_GFP);
+	return (pmd_t *)__get_free_page(PGALLOC_GFP);//helin: 页目录也需要先申请1个物理内存页框，再在里面使用一个item保存。
 }
 
 static inline void pmd_free(struct mm_struct *mm, pmd_t *pmd)

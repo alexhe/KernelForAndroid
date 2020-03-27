@@ -1619,7 +1619,7 @@ static void __init early_fixmap_shutdown(void)
  * paging_init() sets up the page tables, initialises the zone memory
  * maps, and sets up the zero page, bad page and bad page tables.
  */
-void __init paging_init(const struct machine_desc *mdesc)
+void __init paging_init(const struct machine_desc *mdesc) //helin 2020-03-02
 {
 	void *zero_page;
 
@@ -1629,7 +1629,7 @@ void __init paging_init(const struct machine_desc *mdesc)
 	dma_contiguous_remap();
 	early_fixmap_shutdown();
 	devicemaps_init(mdesc);
-	kmap_init();
+	kmap_init(); //helin
 	tcm_init();
 
 	top_pmd = pmd_off_k(0xffff0000);
@@ -1640,7 +1640,7 @@ void __init paging_init(const struct machine_desc *mdesc)
 	bootmem_init();
 
 	empty_zero_page = virt_to_page(zero_page);
-	__flush_dcache_page(NULL, empty_zero_page);
+	__flush_dcache_page(NULL, empty_zero_page); //helin
 
 	/* Compute the virt/idmap offset, mostly for the sake of KVM */
 	kimage_voffset = (unsigned long)&kimage_voffset - virt_to_idmap(&kimage_voffset);

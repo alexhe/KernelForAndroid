@@ -4674,7 +4674,7 @@ void si_meminfo(struct sysinfo *val)
 	val->totalram = totalram_pages;
 	val->sharedram = global_node_page_state(NR_SHMEM);
 	val->freeram = global_zone_page_state(NR_FREE_PAGES);
-	val->bufferram = nr_blockdev_pages();
+	val->bufferram = nr_blockdev_pages(); //helin: buffer cache来源：所有block dev 的inode映射的page总数
 	val->totalhigh = totalhigh_pages;
 	val->freehigh = nr_free_highpages();
 	val->mem_unit = PAGE_SIZE;
@@ -6287,7 +6287,7 @@ static void __ref alloc_node_mem_map(struct pglist_data *pgdat)
 	 * With no DISCONTIG, the global mem_map is just set as node 0's
 	 */
 	if (pgdat == NODE_DATA(0)) {
-		mem_map = NODE_DATA(0)->node_mem_map;
+		mem_map = NODE_DATA(0)->node_mem_map; //helin
 #if defined(CONFIG_HAVE_MEMBLOCK_NODE_MAP) || defined(CONFIG_FLATMEM)
 		if (page_to_pfn(mem_map) != pgdat->node_start_pfn)
 			mem_map -= offset;
@@ -7370,7 +7370,7 @@ static unsigned long __init arch_reserved_kernel_pages(void)
  *   quantity of entries
  * - limit is the number of hash buckets, not the total allocation size
  */
-void *__init alloc_large_system_hash(const char *tablename,
+void *__init alloc_large_system_hash(const char *tablename, //helin
 				     unsigned long bucketsize,
 				     unsigned long numentries,
 				     int scale,

@@ -294,7 +294,7 @@
 #define OUTPUT_POOL_SHIFT	10
 #define OUTPUT_POOL_WORDS	(1 << (OUTPUT_POOL_SHIFT-5))
 #define SEC_XFER_SIZE		512
-#define EXTRACT_SIZE		10
+#define EXTRACT_SIZE		10 //helin
 
 
 #define LONGS(x) (((x) + sizeof(unsigned long) - 1)/sizeof(unsigned long))
@@ -1425,7 +1425,8 @@ static void extract_buf(struct entropy_store *r, __u8 *out)
 	union {
 		__u32 w[5];
 		unsigned long l[LONGS(20)];
-	} hash;
+	} hash; //helin: 20个字节
+
 	__u32 workspace[SHA_WORKSPACE_WORDS];
 	unsigned long flags;
 
@@ -1433,7 +1434,7 @@ static void extract_buf(struct entropy_store *r, __u8 *out)
 	 * If we have an architectural hardware random number
 	 * generator, use it for SHA's initial vector
 	 */
-	sha_init(hash.w);
+	sha_init(hash.w); //helin: sha1 初始化word数组
 	for (i = 0; i < LONGS(20); i++) {
 		unsigned long v;
 		if (!arch_get_random_long(&v))
@@ -1557,7 +1558,7 @@ static ssize_t extract_entropy_user(struct entropy_store *r, void __user *buf,
 	nbytes = account(r, nbytes, 0, 0);
 
 	while (nbytes) {
-		if (large_request && need_resched()) {
+		if (large_request && need_resched()) {//helin: 大量随机数生成，多次生成
 			if (signal_pending(current)) {
 				if (ret == 0)
 					ret = -ERESTARTSYS;
@@ -1566,7 +1567,7 @@ static ssize_t extract_entropy_user(struct entropy_store *r, void __user *buf,
 			schedule();
 		}
 
-		extract_buf(r, tmp);
+		extract_buf(r, tmp); //helin: 小量随机数 一次生成
 		i = min_t(int, nbytes, EXTRACT_SIZE);
 		if (copy_to_user(buf, tmp, i)) {
 			ret = -EFAULT;
@@ -1892,7 +1893,7 @@ _random_read(int nonblock, char __user *buf, size_t nbytes)
 
 	nbytes = min_t(size_t, nbytes, SEC_XFER_SIZE);
 	while (1) {
-		n = extract_entropy_user(&blocking_pool, buf, nbytes);
+		n = extract_entropy_user(&blocking_pool, buf, nbytes); //helin
 		if (n < 0)
 			return n;
 		trace_random_read(n*8, (nbytes-n)*8,
@@ -1937,7 +1938,7 @@ urandom_read(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
 		spin_unlock_irqrestore(&primary_crng.lock, flags);
 	}
 	nbytes = min_t(size_t, nbytes, INT_MAX >> (ENTROPY_SHIFT + 3));
-	ret = extract_crng_user(buf, nbytes);
+	ret = extract_crng_user(buf, nbytes); //helin: 这个是干嘛的?
 	trace_urandom_read(8 * nbytes, 0, ENTROPY_BITS(&input_pool));
 	return ret;
 }
@@ -1999,7 +2000,7 @@ static ssize_t random_write(struct file *file, const char __user *buffer,
 	return (ssize_t)count;
 }
 
-static long random_ioctl(struct file *f, unsigned int cmd, unsigned long arg)
+static long random_ioctl(struct file *f, unsigned int cmd, unsigned long arg) //helin: ioctl
 {
 	int size, ent_count;
 	int __user *p = (int __user *)arg;
@@ -2061,7 +2062,7 @@ static int random_fasync(int fd, struct file *filp, int on)
 	return fasync_helper(fd, filp, on, &fasync);
 }
 
-const struct file_operations random_fops = {
+const struct file_operations random_fops = { //helin
 	.read  = random_read,
 	.write = random_write,
 	.poll  = random_poll,
@@ -2070,7 +2071,7 @@ const struct file_operations random_fops = {
 	.llseek = noop_llseek,
 };
 
-const struct file_operations urandom_fops = {
+const struct file_operations urandom_fops = { //helin:
 	.read  = urandom_read,
 	.write = random_write,
 	.unlocked_ioctl = random_ioctl,

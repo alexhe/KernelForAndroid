@@ -242,7 +242,7 @@ static inline int qdisc_restart(struct Qdisc *q, int *packets)
 	bool validate;
 
 	/* Dequeue packet */
-	skb = dequeue_skb(q, &validate, packets);
+	skb = dequeue_skb(q, &validate, packets); //helin: 出队列
 	if (unlikely(!skb))
 		return 0;
 
@@ -250,7 +250,7 @@ static inline int qdisc_restart(struct Qdisc *q, int *packets)
 	dev = qdisc_dev(q);
 	txq = skb_get_tx_queue(dev, skb);
 
-	return sch_direct_xmit(skb, q, dev, txq, root_lock, validate);
+	return sch_direct_xmit(skb, q, dev, txq, root_lock, validate); //helin: 数据发送
 }
 
 void __qdisc_run(struct Qdisc *q)

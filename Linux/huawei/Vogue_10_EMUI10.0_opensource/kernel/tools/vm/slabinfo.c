@@ -46,7 +46,7 @@ struct slabinfo {
 	unsigned long cpu_partial_alloc, cpu_partial_free;
 	int numa[MAX_NODES];
 	int numa_partial[MAX_NODES];
-} slabinfo[MAX_SLABS];
+} slabinfo[MAX_SLABS]; //helin: 最大500个slabs
 
 struct aliasinfo {
 	char *name;
@@ -1158,7 +1158,7 @@ static int slab_mismatch(char *slab)
 	return regexec(&pattern, slab, 0, NULL, 0);
 }
 
-static void read_slab_dir(void)
+static void read_slab_dir(void) //helin
 {
 	DIR *dir;
 	struct dirent *de;
@@ -1168,7 +1168,7 @@ static void read_slab_dir(void)
 	char *t;
 	int count;
 
-	if (chdir("/sys/kernel/slab") && chdir("/sys/slab"))
+	if (chdir("/sys/kernel/slab") && chdir("/sys/slab")) //helin: 切换到slab目录
 		fatal("SYSFS support for SLUB not active\n");
 
 	dir = opendir(".");
@@ -1194,10 +1194,10 @@ static void read_slab_dir(void)
 		   case DT_DIR:
 			if (chdir(de->d_name))
 				fatal("Unable to access slab %s\n", slab->name);
-			slab->name = strdup(de->d_name);
+			slab->name = strdup(de->d_name); //helin: 目录名字
 			slab->alias = 0;
 			slab->refs = 0;
-			slab->aliases = get_obj("aliases");
+			slab->aliases = get_obj("aliases"); //helin: get_obj 是打开对应文件读取内容
 			slab->align = get_obj("align");
 			slab->cache_dma = get_obj("cache_dma");
 			slab->cpu_slabs = get_obj("cpu_slabs");

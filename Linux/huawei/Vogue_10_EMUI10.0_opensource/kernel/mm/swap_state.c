@@ -39,7 +39,8 @@ static const struct address_space_operations swap_aops = {
 
 struct address_space *swapper_spaces[MAX_SWAPFILES];
 static unsigned int nr_swapper_spaces[MAX_SWAPFILES];
-bool swap_vma_readahead = true;
+
+bool swap_vma_readahead = true; //helin: 内存型变量
 
 #define SWAP_RA_WIN_SHIFT	(PAGE_SHIFT / 2)
 #define SWAP_RA_HITS_MASK	((1UL << SWAP_RA_WIN_SHIFT) - 1)
@@ -770,6 +771,7 @@ skip:
 				     swap_ra->win == 1);
 }
 
+//helin: sys fs 属性对应的 attr和 show()/store() 方法
 #ifdef CONFIG_SYSFS
 static ssize_t vma_ra_enabled_show(struct kobject *kobj,
 				     struct kobj_attribute *attr, char *buf)
@@ -789,9 +791,12 @@ static ssize_t vma_ra_enabled_store(struct kobject *kobj,
 
 	return count;
 }
+
+//helin: 对应路径 /sys/kernel/mm/swap/vma_ra_enabled
 static struct kobj_attribute vma_ra_enabled_attr =
-	__ATTR(vma_ra_enabled, 0644, vma_ra_enabled_show,
-	       vma_ra_enabled_store);
+	__ATTR(vma_ra_enabled, 0644,  //helin: atttr {name, mode}
+			vma_ra_enabled_show,  //helin: show()
+	       	vma_ra_enabled_store); //helin: store()
 
 static struct attribute *swap_attrs[] = {
 	&vma_ra_enabled_attr.attr,
@@ -807,12 +812,12 @@ static int __init swap_init_sysfs(void)
 	int err;
 	struct kobject *swap_kobj;
 
-	swap_kobj = kobject_create_and_add("swap", mm_kobj);
+	swap_kobj = kobject_create_and_add("swap", mm_kobj); //helin: 路径 /sys/kernel/mm/swap
 	if (!swap_kobj) {
 		pr_err("failed to create swap kobject\n");
 		return -ENOMEM;
 	}
-	err = sysfs_create_group(swap_kobj, &swap_attr_group);
+	err = sysfs_create_group(swap_kobj, &swap_attr_group); //helin: 挂载属性 子目录节点
 	if (err) {
 		pr_err("failed to register swap group\n");
 		goto delete_obj;

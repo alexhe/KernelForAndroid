@@ -4554,7 +4554,7 @@ retry:
 			pr_cont(" locked it.\n");
 	}
 
-	do_each_thread(g, p) {
+	do_each_thread(g, p) { //helin: 遍历线程，打印锁
 		/*
 		 * It's not reliable to print a task's held locks
 		 * if it's not sleeping (or if it's not the current

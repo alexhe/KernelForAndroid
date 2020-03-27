@@ -574,6 +574,7 @@ static int do_select(int n, fd_set_bits *fds, struct timespec64 *end_time)
 		 * given, then we convert to ktime_t and set the to
 		 * pointer to the expiry value.
 		 */
+		//helin: select是基于timeout方式的调度实现；epoll是基于事件通知的实现；
 		if (end_time && !to) {
 			expire = timespec64_to_ktime(*end_time);
 			to = &expire;
@@ -597,6 +598,7 @@ static int do_select(int n, fd_set_bits *fds, struct timespec64 *end_time)
  * Update: ERESTARTSYS breaks at least the xview clock binary, so
  * I'm trying ERESTARTNOHAND which restart only when you want to.
  */
+//helin: user层调用select()的具体实现;设置了fd 数量：n； 这个就是是fdtable上新增n个fd占坑；逻辑上，可扩展数量有限
 int core_sys_select(int n, fd_set __user *inp, fd_set __user *outp,
 			   fd_set __user *exp, struct timespec64 *end_time)
 {
@@ -653,7 +655,7 @@ int core_sys_select(int n, fd_set __user *inp, fd_set __user *outp,
 	zero_fd_set(n, fds.res_out);
 	zero_fd_set(n, fds.res_ex);
 
-	ret = do_select(n, &fds, end_time);
+	ret = do_select(n, &fds, end_time); //helin
 
 	if (ret < 0)
 		goto out;
@@ -676,6 +678,7 @@ out_nofds:
 	return ret;
 }
 
+//helin: user层调用select();设置了fd 数量：n； 这个就是是fdtable上新增n个fd占坑；逻辑上，可扩展数量有限
 SYSCALL_DEFINE5(select, int, n, fd_set __user *, inp, fd_set __user *, outp,
 		fd_set __user *, exp, struct timeval __user *, tvp)
 {

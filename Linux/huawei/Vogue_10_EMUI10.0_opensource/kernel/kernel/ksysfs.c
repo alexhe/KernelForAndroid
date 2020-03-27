@@ -207,7 +207,7 @@ static struct bin_attribute notes_attr __ro_after_init  = {
 	.read = &notes_read,
 };
 
-struct kobject *kernel_kobj;
+struct kobject *kernel_kobj; //helin: kernel_kobj
 EXPORT_SYMBOL_GPL(kernel_kobj);
 
 static struct attribute * kernel_attrs[] = {
@@ -241,7 +241,8 @@ static const struct attribute_group kernel_attr_group = {
 static int __init ksysfs_init(void)
 {
 	int error;
-
+	 //helin: sysfs root kobj: kernel_kobj 随 sysfs 一起初始化
+	//helin: 对应路径在 /sys/kernel
 	kernel_kobj = kobject_create_and_add("kernel", NULL);
 	if (!kernel_kobj) {
 		error = -ENOMEM;

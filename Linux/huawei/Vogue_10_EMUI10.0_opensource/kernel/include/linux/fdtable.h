@@ -45,7 +45,7 @@ static inline bool fd_is_open(unsigned int fd, const struct fdtable *fdt)
 /*
  * Open file table structure
  */
-struct files_struct {
+struct files_struct { //helin
   /*
    * read mostly part
    */

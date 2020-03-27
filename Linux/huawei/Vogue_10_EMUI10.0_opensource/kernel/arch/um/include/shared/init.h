@@ -121,7 +121,7 @@ extern struct uml_param __uml_setup_start, __uml_setup_end;
 /* Userspace initcalls shouldn't depend on anything in the kernel, so we'll
  * make them run first.
  */
-#define __initcall(fn) __define_initcall("1", fn)
+#define __initcall(fn) __define_initcall("1", fn) //helin
 
 #define __exitcall(fn) static exitcall_t __exitcall_##fn __exit_call = fn
 

@@ -946,7 +946,7 @@ void __init pagecache_init(void)
 	int i;
 
 	for (i = 0; i < PAGE_WAIT_TABLE_SIZE; i++)
-		init_waitqueue_head(&page_wait_table[i]);
+		init_waitqueue_head(&page_wait_table[i]); //helin: table 有 256个waitqueue
 
 	page_writeback_init();
 }

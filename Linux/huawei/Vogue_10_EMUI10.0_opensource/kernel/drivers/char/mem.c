@@ -644,13 +644,13 @@ static ssize_t write_port(struct file *file, const char __user *buf,
 static ssize_t read_null(struct file *file, char __user *buf,
 			 size_t count, loff_t *ppos)
 {
-	return 0;
+	return 0; //helin: /dev/null 直接返回 0
 }
 
 static ssize_t write_null(struct file *file, const char __user *buf,
 			  size_t count, loff_t *ppos)
 {
-	return count;
+	return count; //helin: /dev/null 写入直接空实现
 }
 
 static ssize_t read_iter_null(struct kiocb *iocb, struct iov_iter *to)
@@ -814,7 +814,7 @@ static const struct file_operations __maybe_unused kmem_fops = {
 #endif
 };
 
-static const struct file_operations null_fops = {
+static const struct file_operations null_fops = { //helin: /dev/null 设备的操作函数
 	.llseek		= null_lseek,
 	.read		= read_null,
 	.write		= write_null,
@@ -866,8 +866,8 @@ static const struct memdev {
 #endif
 	 [5] = { "zero", 0666, &zero_fops, 0 },
 	 [7] = { "full", 0666, &full_fops, 0 },
-	 [8] = { "random", 0666, &random_fops, 0 },
-	 [9] = { "urandom", 0666, &urandom_fops, 0 },
+	 [8] = { "random", 0666, &random_fops, 0 }, //helin: 随机数生成器
+	 [9] = { "urandom", 0666, &urandom_fops, 0 }, //helin: 随机数生成器
 #ifdef CONFIG_PRINTK
 	[11] = { "kmsg", 0644, &kmsg_fops, 0 },
 #endif

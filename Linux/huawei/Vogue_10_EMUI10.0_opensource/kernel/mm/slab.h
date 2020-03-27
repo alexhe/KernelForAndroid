@@ -5,6 +5,7 @@
  * Internal slab definitions
  */
 
+//helin: slob 类型 定义
 #ifdef CONFIG_SLOB
 /*
  * Common fields provided in kmem_cache by all slab allocators
@@ -17,7 +18,7 @@
  * separate allocations in the kmem_cache structure of SLAB and
  * SLUB is no longer needed.
  */
-struct kmem_cache {
+struct kmem_cache { //helin: for slob
 	unsigned int object_size;/* The original size of the object */
 	unsigned int size;	/* The aligned/padded/added on size  */
 	unsigned int align;	/* Alignment as calculated */
@@ -30,13 +31,16 @@ struct kmem_cache {
 
 #endif /* CONFIG_SLOB */
 
+//helin: slab 类型 定义
 #ifdef CONFIG_SLAB
-#include <linux/slab_def.h>
+#include <linux/slab_def.h> //helin: for slab
 #endif
 
+//helin: slub 类型 定义
 #ifdef CONFIG_SLUB
-#include <linux/slub_def.h>
+#include <linux/slub_def.h> //helin: for slub
 #endif
+
 
 #include <linux/memcontrol.h>
 #include <linux/fault-inject.h>
@@ -390,7 +394,7 @@ static inline struct kmem_cache *cache_from_obj(struct kmem_cache *s, void *x)
 		return s;
 
 	page = virt_to_head_page(x);
-	cachep = page->slab_cache;
+	cachep = page->slab_cache; //helin
 	if (slab_equal_or_root(cachep, s))
 		return cachep;
 
@@ -475,8 +479,8 @@ static inline void slab_post_alloc_hook(struct kmem_cache *s, gfp_t flags,
 struct kmem_cache_node {
 	spinlock_t list_lock;
 
-#ifdef CONFIG_SLAB
-	struct list_head slabs_partial;	/* partial list first, better asm code */
+#ifdef CONFIG_SLAB //helin. 2020-03-08
+	struct list_head slabs_partial;	/* partial list first, better asm code */ //helin. 2020-03-08
 	struct list_head slabs_full;
 	struct list_head slabs_free;
 	unsigned long total_slabs;	/* length of all slab lists */

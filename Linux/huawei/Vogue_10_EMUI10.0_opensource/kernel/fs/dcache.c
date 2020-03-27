@@ -88,7 +88,7 @@ __cacheline_aligned_in_smp DEFINE_SEQLOCK(rename_lock);
 
 EXPORT_SYMBOL(rename_lock);
 
-static struct kmem_cache *dentry_cache __read_mostly;
+static struct kmem_cache *dentry_cache __read_mostly; //helin: 单个dentry实例分配的slab缓存
 
 const struct qstr empty_name = QSTR_INIT("", 0);
 EXPORT_SYMBOL(empty_name);
@@ -107,7 +107,7 @@ EXPORT_SYMBOL(slash_name);
 static unsigned int d_hash_mask __read_mostly;
 static unsigned int d_hash_shift __read_mostly;
 
-static struct hlist_bl_head *dentry_hashtable __read_mostly;
+static struct hlist_bl_head *dentry_hashtable __read_mostly; //helin: dentry的缓存表
 
 static inline struct hlist_bl_head *d_hash(unsigned int hash)
 {
@@ -482,7 +482,7 @@ static void ___d_drop(struct dentry *dentry)
 		if (unlikely(IS_ROOT(dentry)))
 			b = &dentry->d_sb->s_anon;
 		else
-			b = d_hash(dentry->d_name.hash);
+			b = d_hash(dentry->d_name.hash); //helin: 找到要drop的dentry
 
 		hlist_bl_lock(b);
 		__hlist_bl_del(&dentry->d_hash);
@@ -1620,10 +1620,10 @@ struct dentry *__d_alloc(struct super_block *sb, const struct qstr *name)
 	 * be overwriting an internal NUL character
 	 */
 	dentry->d_iname[DNAME_INLINE_LEN-1] = 0;
-	if (unlikely(!name)) {
+	if (unlikely(!name)) { //helin: 没有名字
 		name = &slash_name;
 		dname = dentry->d_iname;
-	} else if (name->len > DNAME_INLINE_LEN-1) {
+	} else if (name->len > DNAME_INLINE_LEN-1) { //helin: 名字太长
 		size_t size = offsetof(struct external_name, name[1]);
 		struct external_name *p = kmalloc(size + name->len,
 						  GFP_KERNEL_ACCOUNT);
@@ -1636,7 +1636,7 @@ struct dentry *__d_alloc(struct super_block *sb, const struct qstr *name)
 		if (IS_ENABLED(CONFIG_DCACHE_WORD_ACCESS))
 			kasan_unpoison_shadow(dname,
 				round_up(name->len + 1,	sizeof(unsigned long)));
-	} else  {
+	} else  { //helin: 名字合理大小
 		dname = dentry->d_iname;
 	}	
 
@@ -1707,7 +1707,7 @@ struct dentry *d_alloc(struct dentry * parent, const struct qstr *name)
 	 * to concurrency here
 	 */
 	__dget_dlock(parent);
-	dentry->d_parent = parent;
+	dentry->d_parent = parent; //helin: 由于__d_alloc() 没有正确配置parent，这里重新赋值
 	list_add(&dentry->d_child, &parent->d_subdirs);
 	spin_unlock(&parent->d_lock);
 
@@ -2229,6 +2229,7 @@ seqretry:
 				cpu_relax();
 				goto seqretry;
 			}
+			//helin: 遍历查找dentry进行比较
 			if (parent->d_op->d_compare(dentry,
 						    tlen, tname, name) != 0)
 				continue;
@@ -3621,7 +3622,7 @@ static int __init set_dhash_entries(char *str)
 	dhash_entries = simple_strtoul(str, &str, 0);
 	return 1;
 }
-__setup("dhash_entries=", set_dhash_entries);
+__setup("dhash_entries=", set_dhash_entries); //helin: 解析 bootargs启动参数, 调用回调函数解析；设置该值
 
 static void __init dcache_init_early(void)
 {
@@ -3650,13 +3651,14 @@ static void __init dcache_init(void)
 	 * but it is probably not worth it because of the cache nature
 	 * of the dcache.
 	 */
+	//helin: slab分配dentry结构的对象空间
 	dentry_cache = KMEM_CACHE(dentry,
 		SLAB_RECLAIM_ACCOUNT|SLAB_PANIC|SLAB_MEM_SPREAD|SLAB_ACCOUNT);
 
 	/* Hash may have been set up in dcache_init_early */
 	if (!hashdist)
 		return;
-
+	//helin: dentry_hashtable 目录缓存cache 分配空间
 	dentry_hashtable =
 		alloc_large_system_hash("Dentry cache",
 					sizeof(struct hlist_bl_head),
@@ -3675,7 +3677,7 @@ EXPORT_SYMBOL(names_cachep);
 
 EXPORT_SYMBOL(d_genocide);
 
-void __init vfs_caches_init_early(void)
+void __init vfs_caches_init_early(void) //helin
 {
 	int i;
 

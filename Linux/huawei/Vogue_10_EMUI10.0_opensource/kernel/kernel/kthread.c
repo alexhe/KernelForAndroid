@@ -24,13 +24,13 @@
 #include <trace/events/sched.h>
 
 static DEFINE_SPINLOCK(kthread_create_lock);
-static LIST_HEAD(kthread_create_list);
+static LIST_HEAD(kthread_create_list); //helin
 struct task_struct *kthreadd_task;
 
 struct kthread_create_info
 {
 	/* Information passed to kthread() from kthreadd. */
-	int (*threadfn)(void *data);
+	int (*threadfn)(void *data); //helin
 	void *data;
 	int node;
 
@@ -284,8 +284,8 @@ static int kthread_smpboot(void *_create)
 static int kthread(void *_create)
 {
 	/* Copy data: it's on kthread's stack */
-	struct kthread_create_info *create = _create;
-	int (*threadfn)(void *data) = create->threadfn;
+	struct kthread_create_info *create = _create; //helin
+	int (*threadfn)(void *data) = create->threadfn; //helin
 	void *data = create->data;
 	struct completion *done;
 	struct kthread *self;
@@ -351,7 +351,8 @@ static void create_kthread(struct kthread_create_info *create)
 		pid = kernel_thread(kthread_smpboot, create, CLONE_FS | CLONE_FILES | SIGCHLD);
 	else
 #endif
-		pid = kernel_thread(kthread, create, CLONE_FS | CLONE_FILES | SIGCHLD);
+		//helin: int kthread(void *_create)
+		pid = kernel_thread(kthread, create, CLONE_FS | CLONE_FILES | SIGCHLD); //helin:
 	if (pid < 0) {
 		/* If user was SIGKILLed, I release the structure. */
 		struct completion *done = xchg(&create->done, NULL);
@@ -644,7 +645,7 @@ int kthreadd(void *unused)
 	struct task_struct *tsk = current;
 
 	/* Setup a clean context for our children to inherit. */
-	set_task_comm(tsk, "kthreadd");
+	set_task_comm(tsk, "kthreadd"); //helin
 	ignore_signals(tsk);
 	set_cpus_allowed_ptr(tsk, cpu_all_mask);
 	set_mems_allowed(node_states[N_MEMORY]);
@@ -667,7 +668,7 @@ int kthreadd(void *unused)
 			list_del_init(&create->list);
 			spin_unlock(&kthread_create_lock);
 
-			create_kthread(create);
+			create_kthread(create); //helin: 创建 kthread
 
 			spin_lock(&kthread_create_lock);
 		}

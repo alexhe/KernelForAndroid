@@ -149,16 +149,16 @@ struct epitem {
 	};
 
 	/* List header used to link this structure to the eventpoll ready list */
-	struct list_head rdllink;
+	struct list_head rdllink; //helin: ready-list 链表
 
 	/*
 	 * Works together "struct eventpoll"->ovflist in keeping the
 	 * single linked chain of items.
 	 */
-	struct epitem *next;
+	struct epitem *next; //helin: 单链表连接各个ep项
 
 	/* The file descriptor information this item refers to */
-	struct epoll_filefd ffd;
+	struct epoll_filefd ffd; //helin: 这个ep项对应的fd
 
 	/* Number of active wait queue attached to poll operations */
 	int nwait;
@@ -167,7 +167,7 @@ struct epitem {
 	struct list_head pwqlist;
 
 	/* The "container" of this item */
-	struct eventpoll *ep;
+	struct eventpoll *ep; //helin: fd项挂载到root ep上
 
 	/* List header used to link this item to the "struct file" items list */
 	struct list_head fllink;
@@ -176,7 +176,7 @@ struct epitem {
 	struct wakeup_source __rcu *ws;
 
 	/* The structure that describe the interested events and the source fd */
-	struct epoll_event event;
+	struct epoll_event event; //helin: 该fd监控的事件
 };
 
 /*
@@ -213,7 +213,7 @@ struct eventpoll {
 	 * happened while transferring ready events to userspace w/out
 	 * holding ->lock.
 	 */
-	struct epitem *ovflist;
+	struct epitem *ovflist; //helin: 挂载的ep项链表
 
 	/* wakeup_source used when ep_scan_ready_list is running */
 	struct wakeup_source *ws;
@@ -1955,7 +1955,7 @@ static void clear_tfile_check_list(void)
 /*
  * Open an eventpoll file descriptor.
  */
-SYSCALL_DEFINE1(epoll_create1, int, flags)
+SYSCALL_DEFINE1(epoll_create1, int, flags) //helin: 创建epoll
 {
 	int error, fd;
 	struct eventpoll *ep = NULL;
@@ -1988,7 +1988,7 @@ SYSCALL_DEFINE1(epoll_create1, int, flags)
 		goto out_free_fd;
 	}
 	ep->file = file;
-	fd_install(fd, file);
+	fd_install(fd, file); //helin: fd和inode-file绑定
 	return fd;
 
 out_free_fd:
@@ -1998,7 +1998,7 @@ out_free_ep:
 	return error;
 }
 
-SYSCALL_DEFINE1(epoll_create, int, size)
+SYSCALL_DEFINE1(epoll_create, int, size) //helin: user端创建epoll， 其实size 没有使用; 内部采用链表和红黑树实现；逻辑上可以无限多item；但还是受限max fds系统设置
 {
 	if (size <= 0)
 		return -EINVAL;
@@ -2103,7 +2103,7 @@ SYSCALL_DEFINE4(epoll_ctl, int, epfd, int, op, int, fd,
 					goto error_tgt_fput;
 				}
 			} else
-				list_add(&tf.file->f_tfile_llink,
+				list_add(&tf.file->f_tfile_llink, //helin:  这是什么加入链表?
 							&tfile_check_list);
 			mutex_lock_nested(&ep->mtx, 0);
 			if (is_file_epoll(tf.file)) {
@@ -2125,7 +2125,7 @@ SYSCALL_DEFINE4(epoll_ctl, int, epfd, int, op, int, fd,
 	case EPOLL_CTL_ADD:
 		if (!epi) {
 			epds.events |= POLLERR | POLLHUP;
-			error = ep_insert(ep, &epds, tf.file, fd, full_check);
+			error = ep_insert(ep, &epds, tf.file, fd, full_check); //helin: ep item 加入红黑树
 		} else
 			error = -EEXIST;
 		if (full_check)
@@ -2133,7 +2133,7 @@ SYSCALL_DEFINE4(epoll_ctl, int, epfd, int, op, int, fd,
 		break;
 	case EPOLL_CTL_DEL:
 		if (epi)
-			error = ep_remove(ep, epi);
+			error = ep_remove(ep, epi); //helin: ep item 移除
 		else
 			error = -ENOENT;
 		break;
@@ -2141,7 +2141,7 @@ SYSCALL_DEFINE4(epoll_ctl, int, epfd, int, op, int, fd,
 		if (epi) {
 			if (!(epi->event.events & EPOLLEXCLUSIVE)) {
 				epds.events |= POLLERR | POLLHUP;
-				error = ep_modify(ep, epi, &epds);
+				error = ep_modify(ep, epi, &epds); //helin: 修改 ep item
 			}
 		} else
 			error = -ENOENT;

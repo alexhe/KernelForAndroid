@@ -635,8 +635,8 @@ enum wbt_flags wbt_wait(struct rq_wb *rwb, struct bio *bio, spinlock_t *lock)
 	if (!rwb_enabled(rwb))
 		return 0;
 
-	if (bio_op(bio) == REQ_OP_READ)
-		ret = WBT_READ;
+	if (bio_op(bio) == REQ_OP_READ) //helin: REQ_OP_READ = 0
+		ret = WBT_READ; //helin: WBT_READ = 2
 
 	if (!wbt_should_throttle(rwb, bio)) {
 		if (ret & WBT_READ)

@@ -948,12 +948,12 @@ static void disable_all_vf_links(struct octeon_device *oct)
 	}
 }
 
-static int liquidio_watchdog(void *param)
+static int liquidio_watchdog(void *param) //helin
 {
 	bool err_msg_was_printed[LIO_MAX_CORES];
 	u16 mask_of_crashed_or_stuck_cores = 0;
 	bool all_vf_links_are_disabled = false;
-	struct octeon_device *oct = param;
+	struct octeon_device *oct = param; //helin: param -> oct_dev
 	struct octeon_device *other_oct;
 #ifdef CONFIG_MODULE_UNLOAD
 	long refcount, vfs_referencing_pf;
@@ -963,22 +963,23 @@ static int liquidio_watchdog(void *param)
 
 	memset(err_msg_was_printed, 0, sizeof(err_msg_was_printed));
 
-	while (!kthread_should_stop()) {
+	while (!kthread_should_stop()) { //helin: call kthread_stop() set KTHREAD_SHOULD_STOP bit 
 		/* sleep for a couple of seconds so that we don't hog the CPU */
 		set_current_state(TASK_INTERRUPTIBLE);
-		schedule_timeout(msecs_to_jiffies(2000));
+		schedule_timeout(msecs_to_jiffies(2000)); //helin: 休眠 2s timeout； watchdog 每2s 检查一次异常；
 
 		mask_of_crashed_or_stuck_cores =
-		    (u16)octeon_read_csr64(oct, CN23XX_SLI_SCRATCH2);
+		    (u16)octeon_read_csr64(oct, CN23XX_SLI_SCRATCH2); //helin: 读取crash标志
 
-		if (!mask_of_crashed_or_stuck_cores)
+		if (!mask_of_crashed_or_stuck_cores) //helin: 0 :正常运行，没有crash
 			continue;
-
+		//helin: 运行到这里，代表标志不为0， 出现了crash
 		WRITE_ONCE(oct->cores_crashed, true);
 		other_oct = get_other_octeon_device(oct);
 		if (other_oct)
 			WRITE_ONCE(other_oct->cores_crashed, true);
 
+		//helin: 遍历所有的cores，如果出现stuck，打印日志
 		for (core = 0; core < LIO_MAX_CORES; core++) {
 			bool core_crashed_or_got_stuck;
 
@@ -1091,8 +1092,8 @@ liquidio_probe(struct pci_dev *pdev,
 
 			bus = pdev->bus->number;
 			device = PCI_SLOT(pdev->devfn);
-			function = PCI_FUNC(pdev->devfn);
-			oct_dev->watchdog_task = kthread_create(
+			function = PCI_FUNC(pdev->devfn); //helin
+			oct_dev->watchdog_task = kthread_create( //helin: kthread_create(threadfn, data, namefmt, arg...)
 			    liquidio_watchdog, oct_dev,
 			    "liowd/%02hhx:%02hhx.%hhx", bus, device, function);
 			if (!IS_ERR(oct_dev->watchdog_task)) {

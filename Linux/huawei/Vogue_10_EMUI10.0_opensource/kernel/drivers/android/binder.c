@@ -3550,7 +3550,7 @@ static struct binder_node *binder_get_node_refs_for_txn(
 	return target_node;
 }
 
-static void binder_transaction(struct binder_proc *proc,
+static void binder_transaction(struct binder_proc *proc, //helin
 			       struct binder_thread *thread,
 			       struct binder_transaction_data *tr, int reply,
 			       binder_size_t extra_buffers_size)
@@ -5177,7 +5177,7 @@ retry:
 		}
 		ptr += trsize;
 
-		trace_binder_transaction_received(t);
+		trace_binder_transaction_received(t); //helin: binder_trace.h 中定义的
 		binder_stat_br(proc, thread, cmd);
 		binder_debug(BINDER_DEBUG_TRANSACTION,
 			     "%d:%d %s %d %d:%d, cmd %d size %zd-%zd ptr %016llx-%016llx\n",
@@ -5934,7 +5934,7 @@ static const struct vm_operations_struct binder_vm_ops = {
 	.fault = binder_vm_fault,
 };
 
-static int binder_mmap(struct file *filp, struct vm_area_struct *vma)
+static int binder_mmap(struct file *filp, struct vm_area_struct *vma) //helin: mmap
 {
 	int ret;
 	struct binder_proc *proc = filp->private_data;
@@ -7043,7 +7043,7 @@ static int __init init_binder_device(const char *name)
 	binder_device->context.name = name;
 	mutex_init(&binder_device->context.context_mgr_node_lock);
 
-	ret = misc_register(&binder_device->miscdev);
+	ret = misc_register(&binder_device->miscdev); //helin: misc 设备注册
 	if (ret < 0) {
 		kfree(binder_device);
 		return ret;
@@ -7173,7 +7173,7 @@ err_alloc_device_names_failed:
 	return ret;
 }
 
-device_initcall(binder_init);
+device_initcall(binder_init); //helin: binder driver init
 
 #define CREATE_TRACE_POINTS
 #include "binder_trace.h"

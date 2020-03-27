@@ -12,7 +12,7 @@
 
 enum wbt_flags {
 	WBT_TRACKED		= 1,	/* write, tracked for throttling */
-	WBT_READ		= 2,	/* read */
+	WBT_READ		= 2,	/* read */ //helin
 	WBT_KSWAPD		= 4,	/* write, from kswapd */
 
 	WBT_NR_BITS		= 3,	/* number of bits */

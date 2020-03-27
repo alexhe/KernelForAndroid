@@ -457,19 +457,20 @@ extern bool force_irqthreads;
 
 enum
 {
-	HI_SOFTIRQ=0,
-	TIMER_SOFTIRQ,
+	HI_SOFTIRQ=0, //helin
+	TIMER_SOFTIRQ, //helin
 	NET_TX_SOFTIRQ,
 	NET_RX_SOFTIRQ,
-	BLOCK_SOFTIRQ,
+
+	BLOCK_SOFTIRQ, //helin: 块设备
 	IRQ_POLL_SOFTIRQ,
-	TASKLET_SOFTIRQ,
+	TASKLET_SOFTIRQ, //helin
 	SCHED_SOFTIRQ,
 	HRTIMER_SOFTIRQ, /* Unused, but kept as tools rely on the
 			    numbering. Sigh! */
 	RCU_SOFTIRQ,    /* Preferable RCU should always be the last softirq */
 
-	NR_SOFTIRQS
+	NR_SOFTIRQS //helin: enum
 };
 
 #define SOFTIRQ_STOP_IDLE_MASK (~(1 << RCU_SOFTIRQ))
@@ -591,7 +592,7 @@ extern void __tasklet_hi_schedule(struct tasklet_struct *t);
 static inline void tasklet_hi_schedule(struct tasklet_struct *t)
 {
 	if (!test_and_set_bit(TASKLET_STATE_SCHED, &t->state))
-		__tasklet_hi_schedule(t);
+		__tasklet_hi_schedule(t); //helin
 }
 
 static inline void tasklet_disable_nosync(struct tasklet_struct *t)

@@ -31,7 +31,7 @@
 #define MAX_MSG_SIZE		256
 #define HWLOG_TAG		hwlog_kernel
 #define HWLOG_EXCEPTION_FS	"hwlog_exception"
-#define HWLOG_JANK_FS		"hwlog_jank"
+#define HWLOG_JANK_FS		"hwlog_jank" //helin
 #define HWLOG_DUBAI_FS		"hwlog_dubai"
 
 HWLOG_REGIST();
@@ -39,7 +39,7 @@ static struct file *filp[HW_LOG_ID_MAX] = { NULL, NULL, NULL };
 
 static const char *log_name[HW_LOG_ID_MAX] = {
 	[HW_LOG_ID_EXCEPTION]	= "/dev/" HWLOG_EXCEPTION_FS,
-	[HW_LOG_ID_JANK]	= "/dev/" HWLOG_JANK_FS,
+	[HW_LOG_ID_JANK]	= "/dev/" HWLOG_JANK_FS, //helin: /dev/hwlog_jank
 	[HW_LOG_ID_DUBAI]	= "/dev/" HWLOG_DUBAI_FS,
 };
 

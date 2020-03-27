@@ -57,7 +57,7 @@ struct upid {
 	struct hlist_node pid_chain;
 };
 
-struct pid
+struct pid //helin
 {
 	atomic_t count;
 	unsigned int level;
@@ -67,7 +67,7 @@ struct pid
 	struct upid numbers[1];
 };
 
-extern struct pid init_struct_pid;
+extern struct pid init_struct_pid; //helin
 
 struct pid_link
 {

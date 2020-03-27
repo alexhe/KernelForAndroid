@@ -36,12 +36,12 @@
 #define fdleak_info(format, ...)  \
 	pr_devel("[fdleak]%s %d: " format, __func__, __LINE__, ##__VA_ARGS__)
 
-struct stack_pid_item {
+struct stack_pid_item { //helin: 单个pid的fd泄漏跟踪：多个可疑fd  泄漏堆栈和泄漏次数
 	struct stack_item items[MAX_STACK_TRACE_COUNT];
 	int hit_cnt[MAX_STACK_TRACE_COUNT];
 	int diff_cnt;
 };
-struct fdleak_wp_item {
+struct fdleak_wp_item { //helin： 某个类型的多个pid的fd泄漏跟踪：
 	enum fdleak_wp_id id;
 	char *name;
 	int probe_cnt;
@@ -73,7 +73,7 @@ struct stack_frame_user32 {
 static unsigned long long stack_entries[FDLEAK_MAX_STACK_TRACE_DEPTH];
 
 static unsigned int usertype;
-static int tgid_hiview;
+static int tgid_hiview; //helin: 一次只监控一个gid
 
 DEFINE_MUTEX(mutex);
 
@@ -220,10 +220,10 @@ static int fdleak_process_onoff(struct fdleak_op *op, bool enable)
 		return -1;
 
 	for (wpid = FDLEAK_WP_MIN; wpid < FDLEAK_WP_NUM_MAX; wpid++) {
-		if (!(op->wp_mask & (1 << wpid)))
+		if (!(op->wp_mask & (1 << wpid))) //helin: 寻找对应泄漏类型
 			continue;
 
-		if (fdleak_table[wpid].probe_cnt <= 0) {
+		if (fdleak_table[wpid].probe_cnt <= 0) { //helin: 允许探测次数判断
 			fdleak_err("%s %s is not supported to be probed currently\n",
 				   __func__, fdleak_table[wpid].name);
 			continue;
@@ -239,9 +239,9 @@ static int fdleak_process_onoff(struct fdleak_op *op, bool enable)
 					fdleak_cleanup();
 				tgid_hiview = current->real_parent->tgid;
 			}
-			fdleak_insert_pid(op->pid, wpid);
+			fdleak_insert_pid(op->pid, wpid); //helin: 插入目标pid的wpid类型监控
 		} else {
-			fdleak_remove_pid(op->pid, wpid);
+			fdleak_remove_pid(op->pid, wpid);//helin: 移除目标pid的wpid类型监控
 		}
 
 		mutex_unlock(&mutex);

@@ -18,7 +18,7 @@
 
 #ifndef _LOG_USERTYPE_H
 #define _LOG_USERTYPE_H
-
+//helin: 终端用户类型： 商业用户；粉丝用户；beta用户；公测用户；海外用户；海外商业用户
 #define COMMERCIAL_USER		1
 #define FANS_USER		2
 #define BETA_USER		3

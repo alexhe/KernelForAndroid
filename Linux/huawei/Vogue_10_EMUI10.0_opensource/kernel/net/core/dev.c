@@ -4190,7 +4190,7 @@ static __latent_entropy void net_tx_action(struct softirq_action *h)
 			 */
 			smp_mb__before_atomic();
 			clear_bit(__QDISC_STATE_SCHED, &q->state);
-			qdisc_run(q);
+			qdisc_run(q); //helin:
 			spin_unlock(root_lock);
 		}
 	}
@@ -8847,6 +8847,7 @@ static int __init net_dev_init(void)
 	if (register_pernet_device(&default_device_ops))
 		goto out;
 
+	//helin: net send/recv irq
 	open_softirq(NET_TX_SOFTIRQ, net_tx_action);
 	open_softirq(NET_RX_SOFTIRQ, net_rx_action);
 

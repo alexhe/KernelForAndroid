@@ -54,7 +54,7 @@ static inline bool rdrand_long(unsigned long *v)
 	return false;
 }
 
-static inline bool rdrand_int(unsigned int *v)
+static inline bool rdrand_int(unsigned int *v) //helin: 单个数生成方法, asm汇编怎么实现的?
 {
 	bool ok;
 	unsigned int retry = RDRAND_RETRY_LOOPS;

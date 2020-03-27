@@ -1,7 +1,7 @@
 
 
 /*******************************************************************************
-  1 头文件包含
+  1 脥路脦脛录镁掳眉潞卢
  *******************************************************************************/
 #include <linux/module.h>
 #include <linux/kernel.h>
@@ -350,15 +350,15 @@ int diaginfo_buffer_init(unsigned char **addr, unsigned int size)
 
 /*******************************************************************************
 Function:       irq_trace_hook
-Description:	中断轨迹记录
-Input:		    dir:0中断进入，1中断退出，new_vec:当前中断
+Description:	脰脨露脧鹿矛录拢录脟脗录
+Input:		    dir:0脰脨露脧陆酶脠毛拢卢1脰脨露脧脥脣鲁枚拢卢new_vec:碌卤脟掳脰脨露脧
 Output:		    NA
 Return:		    NA
 ********************************************************************************/
 void irq_trace_hook(unsigned int dir, unsigned int old_vec,
 		    unsigned int new_vec)
 {
-	/* 记录时戳、cpu_id、中断号、中断进出方向； */
+	/* 录脟脗录脢卤麓脕隆垄cpu_id隆垄脰脨露脧潞脜隆垄脰脨露脧陆酶鲁枚路陆脧貌拢禄 */
 	irq_info info;
 	u8 cpu;
 
@@ -387,15 +387,15 @@ EXPORT_SYMBOL(irq_trace_hook);
 
 /*******************************************************************************
 Function:       task_switch_hook
-Description:	记录内核任务轨迹；
-Input:		    pre_task:当前任务task结构体指针，next_task:下一个任务task结构体指针；
+Description:	录脟脗录脛脷潞脣脠脦脦帽鹿矛录拢拢禄
+Input:		    pre_task:碌卤脟掳脠脦脦帽task陆谩鹿鹿脤氓脰赂脮毛拢卢next_task:脧脗脪禄赂枚脠脦脦帽task陆谩鹿鹿脤氓脰赂脮毛拢禄
 Output:		    NA
 Return:		    NA
 Other:          added to kernel/sched/core.c
 ********************************************************************************/
 void task_switch_hook(const void *pre_task, void *next_task)
 {
-	/* 记录时戳、cpu_id、next_task的pid、任务名，到对应cpu的循环buffer； */
+	/* 录脟脗录脢卤麓脕隆垄cpu_id隆垄next_task碌脛pid隆垄脠脦脦帽脙没拢卢碌陆露脭脫娄cpu碌脛脩颅禄路buffer拢禄 */
 	struct task_struct *task = (struct task_struct *)next_task;
 	task_info info;
 	u8 cpu;
@@ -420,14 +420,14 @@ EXPORT_SYMBOL(task_switch_hook);
 
 /*******************************************************************************
 Function:       cpuidle_stat_hook
-Description:	记录cpu进入idle下电，退出idle上电的轨迹
-Input:		    dir:0进入idle or 1退出idle；
+Description:	录脟脗录cpu陆酶脠毛idle脧脗碌莽拢卢脥脣鲁枚idle脡脧碌莽碌脛鹿矛录拢
+Input:		    dir:0陆酶脠毛idle or 1脥脣鲁枚idle拢禄
 Output:		    NA
 Return:		    NA
 ********************************************************************************/
 void cpuidle_stat_hook(u32 dir)
 {
-	/* 记录时戳、cpu_id、进入idle还是退出idle，到对应的循环buffer； */
+	/* 录脟脗录脢卤麓脕隆垄cpu_id隆垄陆酶脠毛idle禄鹿脢脟脥脣鲁枚idle拢卢碌陆露脭脫娄碌脛脩颅禄路buffer拢禄 */
 	cpuidle_info info;
 	u8 cpu;
 
@@ -447,15 +447,15 @@ EXPORT_SYMBOL(cpuidle_stat_hook);
 
 /*******************************************************************************
 Function:       cpu_on_off_hook
-Description:	CPU插拔核记录，当前和SR流程发生的场景一致
-Input:		    cpu：cpu号，on：1加核，0减核
+Description:	CPU虏氓掳脦潞脣录脟脗录拢卢碌卤脟掳潞脥SR脕梅鲁脤路垄脡煤碌脛鲁隆戮掳脪禄脰脗
+Input:		    cpu拢潞cpu潞脜拢卢on拢潞1录脫潞脣拢卢0录玫潞脣
 Output:		    NA
 Return:		    NA
 Other:          added to drivers/cpufreq/cpufreq.c
 ********************************************************************************/
 void cpu_on_off_hook(u32 cpu, u32 on)
 {
-	/* 记录时戳，cpu_id、cpu是on还是off，到对应的循环buffer； */
+	/* 录脟脗录脢卤麓脕拢卢cpu_id隆垄cpu脢脟on禄鹿脢脟off拢卢碌陆露脭脫娄碌脛脩颅禄路buffer拢禄 */
 	cpu_onoff_info info;
 
 	/*hook is not installed. */
@@ -474,15 +474,15 @@ EXPORT_SYMBOL(cpu_on_off_hook);
 
 /*******************************************************************************
 Function:       syscall_hook
-Description:	记录系统调用轨迹
-Input:		    syscall_num:系统调用号, dir:调用进出方向，0:进入，1:退出
+Description:	录脟脗录脧碌脥鲁碌梅脫脙鹿矛录拢
+Input:		    syscall_num:脧碌脥鲁碌梅脫脙潞脜, dir:碌梅脫脙陆酶鲁枚路陆脧貌拢卢0:陆酶脠毛拢卢1:脥脣鲁枚
 Output:		    NA
 Return:		    NA
 Other:          added to arch/arm64/kernel/entry.S
 ********************************************************************************/
 asmlinkage void syscall_hook(u32 syscall_num, u32 dir)
 {
-	/* 记录时戳、系统调用号，到对应的循环buffer； */
+	/* 录脟脗录脢卤麓脕隆垄脧碌脥鲁碌梅脫脙潞脜拢卢碌陆露脭脫娄碌脛脩颅禄路buffer拢禄 */
 	syscall_info info;
 
 	/*hook is not installed. */
@@ -503,14 +503,14 @@ EXPORT_SYMBOL(syscall_hook);
 
 /*******************************************************************************
 Function:       hung_task_hook
-Description:	记录hung task的task信息；
-Input:		    tsk:任务结构体指针，timeout：超时时间；
+Description:	录脟脗录hung task碌脛task脨脜脧垄拢禄
+Input:		    tsk:脠脦脦帽陆谩鹿鹿脤氓脰赂脮毛拢卢timeout拢潞鲁卢脢卤脢卤录盲拢禄
 Output:		    NA
 Return:		    NA
 ********************************************************************************/
 void hung_task_hook(void *tsk, u32 timeout)
 {
-	/* 记录时戳、任务pid、超时时间，到对应的循环buffer； */
+	/* 录脟脗录脢卤麓脕隆垄脠脦脦帽pid隆垄鲁卢脢卤脢卤录盲拢卢碌陆露脭脫娄碌脛脩颅禄路buffer拢禄 */
 	struct task_struct *task = (struct task_struct *)tsk;
 	hung_task_info info;
 
@@ -532,15 +532,15 @@ EXPORT_SYMBOL(hung_task_hook);
 
 /*******************************************************************************
 Function:       tasklet_hook
-Description:     记录tasklet 执行轨迹
-Input:		    address:为tasklet 要执行function的 address, dir:调用进出方向，0:进入，1:退出
+Description:     录脟脗录tasklet 脰麓脨脨鹿矛录拢
+Input:		    address:脦陋tasklet 脪陋脰麓脨脨function碌脛 address, dir:碌梅脫脙陆酶鲁枚路陆脧貌拢卢0:陆酶脠毛拢卢1:脥脣鲁枚
 Output:		    NA
 Return:		    NA
 Other:          added to arch/arm64/kernel/entry.S
 ********************************************************************************/
 asmlinkage void tasklet_hook(u64 address, u32 dir)
 {
-	/* 记录时戳、function address 、CPU 号,到对应的循环buffer */
+	/* 录脟脗录脢卤麓脕隆垄function address 隆垄CPU 潞脜,碌陆露脭脫娄碌脛脩颅禄路buffer */
 	tasklet_info info;
 
 	/*hook is not installed. */
@@ -551,7 +551,7 @@ asmlinkage void tasklet_hook(u64 address, u32 dir)
 	info.action = (u64) address;
 	info.cpu = (u8) smp_processor_id();
 	info.dir = (u8) dir;
-
+	//helin: tasklet trace enter/exit 璺熻釜鏃ュ織
 	hisiap_ringbuffer_write((struct hisiap_ringbuffer_s *)
 				g_hook_buffer_addr[HK_TASKLET], (u8 *)&info);
 }
@@ -559,15 +559,15 @@ EXPORT_SYMBOL(tasklet_hook);
 
 /*******************************************************************************
 Function:       worker_hook
-Description:     记录worker执行轨迹
-Input:		    address:为worker 要执行function的 address, dir:调用进出方向，0:进入，1:退出
+Description:     录脟脗录worker脰麓脨脨鹿矛录拢
+Input:		    address:脦陋worker 脪陋脰麓脨脨function碌脛 address, dir:碌梅脫脙陆酶鲁枚路陆脧貌拢卢0:陆酶脠毛拢卢1:脥脣鲁枚
 Output:		    NA
 Return:		    NA
 Other:          added to arch/arm64/kernel/entry.S
 ********************************************************************************/
 asmlinkage void worker_hook(u64 address, u32 dir)
 {
-	/* 记录时戳、function address 、CPU 号,到对应的循环buffer */
+	/* 录脟脗录脢卤麓脕隆垄function address 隆垄CPU 潞脜,碌陆露脭脫娄碌脛脩颅禄路buffer */
 	worker_info info;
 	u8 cpu;
 
@@ -616,10 +616,10 @@ void hisi_ap_defopen_hook_install(void)
 
 /*******************************************************************************
 Function:       hisi_ap_hook_install
-Description:	安装钩子；
-Input:		    hk：钩子类型
+Description:	掳虏脳掳鹿鲁脳脫拢禄
+Input:		    hk拢潞鹿鲁脳脫脌脿脨脥
 Output:		    NA
-Return:		    0:安装成功，<0:安装失败
+Return:		    0:掳虏脳掳鲁脡鹿娄拢卢<0:掳虏脳掳脢搂掳脺
 ********************************************************************************/
 int hisi_ap_hook_install(hook_type hk)
 {
@@ -639,10 +639,10 @@ int hisi_ap_hook_install(hook_type hk)
 
 /*******************************************************************************
 Function:       hisi_ap_hook_uninstall
-Description:	卸载钩子；
-Input:		    hk：钩子类型
+Description:	脨露脭脴鹿鲁脳脫拢禄
+Input:		    hk拢潞鹿鲁脳脫脌脿脨脥
 Output:		    NA
-Return:		    0:卸载成功，<0:卸载失败
+Return:		    0:脨露脭脴鲁脡鹿娄拢卢<0:脨露脭脴脢搂掳脺
 ********************************************************************************/
 int hisi_ap_hook_uninstall(hook_type hk)
 {

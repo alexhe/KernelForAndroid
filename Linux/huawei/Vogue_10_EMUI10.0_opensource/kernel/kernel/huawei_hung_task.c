@@ -69,7 +69,7 @@
 #define HT_ENABLE 1
 #define HT_DISABLE 0
 #define JANK_TASK_MAXNUM 8
-#define HEARTBEAT_TIME 3
+#define HEARTBEAT_TIME 3 //helin
 #define MAX_LOOP_NUM (CONFIG_DEFAULT_HUNG_TASK_TIMEOUT / HEARTBEAT_TIME)
 #define ONE_MINUTE (60 / HEARTBEAT_TIME)
 #define ONE_AND_HALF_MINUTE (90 / HEARTBEAT_TIME)
@@ -100,7 +100,7 @@
 #define TASK_TYPE_NOSCHEDULE 32 /* it's android watchdog task */
 #define TASK_TYPE_FROZEN 64     /* task is FROZEN */
 #define PID_INIT 1              /* PID for init process,always 1 */
-#define PID_KTHREAD 2           /* PID for kernel kthreadd, always 2 */
+#define PID_KTHREAD 2           /* PID for kernel kthreadd, always 2 */ //helin: kthreadd pid 永远为2
 /* JANK REPORT CONTROLLERS */
 #define JANK_REPORT_LIMIT_PERDAY 5
 #define JANK_REPORT_TRESHOLD 1
@@ -115,7 +115,7 @@
 #define DEFAULT_JANK_DUMP_CNT JANK_REPORT_TRESHOLD
 #define DEFAULT_OTHER_LOG_CNT MAX_LOOP_NUM
 #define HUNG_TASK_RECORDTIME_CNT 4
-#define HUNG_TASK_UPLOAD_ONCE 1
+#define HUNG_TASK_UPLOAD_ONCE 1 //helin
 #define IGN_STATE_INIT 1
 #define IGN_STATE_FIRST 2
 #define IGN_STATE_DONE 3
@@ -126,7 +126,7 @@
 #define TOPAPP_HUNG_FOUND 1
 #define TOPAPP_HUNG_RECORDED 2
 #define MAX_BLOCKED_TASK_CNT 4
-#define WATCHDOG_THREAD_NAME "watchdog"
+#define WATCHDOG_THREAD_NAME "watchdog" //helin
 /*
  * Limit number of tasks checked in a batch.
  * This value controls the preemptibility of khungtaskd since preemption
@@ -190,10 +190,10 @@ struct task_hung_upload {
 };
 /* GLOBAL VARIABLE DEFINITION */
 static struct rb_root list_tasks = RB_ROOT; /* pid */
-static struct hungtask_concernlist_table whitelist[CONCERNLIST_LENGTH];
-static struct hungtask_concernlist_tmptable whitetmplist[CONCERNLIST_LENGTH];
-static struct hungtask_concernlist_table janklist[CONCERNLIST_LENGTH];
-static struct hungtask_ignorelist_table ignorelist[IGNORELIST_LENGTH];
+static struct hungtask_concernlist_table whitelist[CONCERNLIST_LENGTH]; //helin: 白名单
+static struct hungtask_concernlist_tmptable whitetmplist[CONCERNLIST_LENGTH]; //helin: 临时白名单
+static struct hungtask_concernlist_table janklist[CONCERNLIST_LENGTH]; //helin: 卡顿列表
+static struct hungtask_ignorelist_table ignorelist[IGNORELIST_LENGTH]; //helin: 忽略列表
 static pid_t processes_reported_to_jank[MAX_BLOCKED_TASK_CNT];
 static bool whitelist_empty = true;
 static bool janklist_empty = true;
@@ -464,6 +464,7 @@ static int get_task_type(pid_t pid, pid_t tgid, struct task_struct *parent)
 	return flag;
 }
 
+//helin: 遍历所有线程; 获取zygote,system_server,watchdog pid
 static void refresh_zygote_pids(void)
 {
 	int max_count = sysctl_hung_task_check_count;
@@ -602,6 +603,7 @@ static bool insert_task(struct task_item *item, struct rb_root *root)
 	return true;
 }
 
+//helin: dump 阻塞任务
 void hwhungtask_dump_blocked_tasks(struct task_item *taskitem, struct task_struct *p)
 {
 	unsigned long long last_arrival;
@@ -668,14 +670,14 @@ void show_state_filter_ext(unsigned long state_filter)
 		if (((p->state == TASK_RUNNING) || (p->state & state_filter)) &&
 		    (ignorelist_hash_locate(p->pid, HASH_FIND, ignorelist) == HASH_ERROR)) {
 			taskitem = find_task(p->pid, &list_tasks);
-			hwhungtask_dump_blocked_tasks(taskitem, p);
+			hwhungtask_dump_blocked_tasks(taskitem, p); //helin: 遍历线程；打印阻塞线程
 		}
 	}
-	touch_all_softlockup_watchdogs();
+	touch_all_softlockup_watchdogs(); //helin
 	rcu_read_unlock();
 	/* Show locks if hungtask happen */
 	if ((state_filter == TASK_UNINTERRUPTIBLE) || !state_filter)
-		debug_show_all_locks();
+		debug_show_all_locks(); //helin: 
 }
 
 void hwhungtask_show_state_filter(unsigned long state_filter)
@@ -740,7 +742,7 @@ static void do_dump(struct task_struct *task, int flag, int time_in_d_state)
 		pr_err("      %s %s %.*s\n",
 		       print_tainted(), init_utsname()->release,
 		       (int)strcspn(init_utsname()->version, " "), init_utsname()->version);
-		pr_err("\"echo 0 > /proc/sys/kernel/hung_task_timeout_secs\" disables this message\n");
+		pr_err("\"echo 0 > /proc/sys/kernel/hung_task_timeout_secs\" disables this message\n"); //helin
 		do_dump_task(task);
 		touch_nmi_watchdog();
 		if ((unsigned int)flag & FLAG_DUMP_WHITE && (!hung_task_dump_and_upload)) {
@@ -1369,7 +1371,7 @@ static ssize_t watchdog_nosched_store(struct kobject *kobj,
 		hungtask_watchdog_nosched_status = 1;
 		pr_err("hungtask: kick watchdog_nosched_enable\n");
 	} else {
-		pr_err("hungtask: only accept on off or kick\n");
+		pr_err("hungtask: only accept on off or kick\n"); //helin: 3种状态: on off kick;
 	}
 	return (ssize_t) count;
 }
@@ -1561,6 +1563,8 @@ void fetch_hung_task_panic(int new_did_panic)
 	did_panic = new_did_panic;
 }
 
+//helin: /sys/kernel/hungtask/vm_heart
+
 /* used as main thread of khungtaskd */
 static struct kobj_attribute watchdog_nosched_attribute = {
 	.attr = {
@@ -1571,6 +1575,7 @@ static struct kobj_attribute watchdog_nosched_attribute = {
 	.store = watchdog_nosched_store,
 };
 
+//helin: /sys/kernel/hungtask/enable
 static struct kobj_attribute timeout_attribute = {
 	.attr = {
 		 .name = "enable",
@@ -1580,6 +1585,7 @@ static struct kobj_attribute timeout_attribute = {
 	.store = enable_store,
 };
 
+//helin: /sys/kernel/hungtask/monitorlist
 static struct kobj_attribute monitorlist_attr = {
 	.attr = {
 		 .name = "monitorlist",
@@ -1600,7 +1606,7 @@ static struct attribute_group hungtask_attr_group = {
 	.attrs = attrs,
 };
 
-struct kobject *hungtask_kobj;
+struct kobject *hungtask_kobj; //helin
 int create_sysfs_hungtask(void)
 {
 	int retval;
@@ -1608,6 +1614,7 @@ int create_sysfs_hungtask(void)
 	while (kernel_kobj == NULL)
 		msleep(1000); /* sleep 1000ms */
 	/* Create kobject named "hungtask" located at /sys/kernel/huangtask */
+		 //helin: hungtask 挂载到 root kernel_kobj上；对应路径 /sys/kernel/huangtask
 	hungtask_kobj = kobject_create_and_add("hungtask", kernel_kobj);
 	if (!hungtask_kobj)
 		return -ENOMEM;

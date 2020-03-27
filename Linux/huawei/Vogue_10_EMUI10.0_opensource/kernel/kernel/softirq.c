@@ -57,7 +57,7 @@ irq_cpustat_t irq_stat[NR_CPUS] ____cacheline_aligned;
 EXPORT_SYMBOL(irq_stat);
 #endif
 
-static struct softirq_action softirq_vec[NR_SOFTIRQS] __cacheline_aligned_in_smp;
+static struct softirq_action softirq_vec[NR_SOFTIRQS] __cacheline_aligned_in_smp; //helin
 
 DEFINE_PER_CPU(struct task_struct *, ksoftirqd);
 
@@ -260,7 +260,7 @@ restart:
 
 	local_irq_enable();
 
-	h = softirq_vec;
+	h = softirq_vec; //helin: 不同类型的irq数组vector
 
 	while ((softirq_bit = ffs(pending))) {
 		unsigned int vec_nr;
@@ -273,9 +273,9 @@ restart:
 
 		kstat_incr_softirqs_this_cpu(vec_nr);
 
-		trace_softirq_entry(vec_nr);
-		h->action(h);
-		trace_softirq_exit(vec_nr);
+		trace_softirq_entry(vec_nr); //helin: enter trace
+		h->action(h); //helin:
+		trace_softirq_exit(vec_nr); //helin: exit trace
 		if (unlikely(prev_count != preempt_count())) {
 			pr_err("huh, entered softirq %u %s %p with preempt_count %08x, exited with %08x?\n",
 			       vec_nr, softirq_to_name[vec_nr], h->action,
@@ -451,7 +451,8 @@ struct tasklet_head {
 static DEFINE_PER_CPU(struct tasklet_head, tasklet_vec);
 static DEFINE_PER_CPU(struct tasklet_head, tasklet_hi_vec);
 
-void __tasklet_schedule(struct tasklet_struct *t)
+//helin: 把tasklet放到链表中；抛出软中断触发cpu调度
+void __tasklet_schedule(struct tasklet_struct *t) //helin: insert to list
 {
 	unsigned long flags;
 
@@ -459,7 +460,7 @@ void __tasklet_schedule(struct tasklet_struct *t)
 	t->next = NULL;
 	*__this_cpu_read(tasklet_vec.tail) = t;
 	__this_cpu_write(tasklet_vec.tail, &(t->next));
-	raise_softirq_irqoff(TASKLET_SOFTIRQ);
+	raise_softirq_irqoff(TASKLET_SOFTIRQ); //helin: 触发软中断 TASKLET_SOFTIRQ
 	local_irq_restore(flags);
 }
 EXPORT_SYMBOL(__tasklet_schedule);
@@ -472,12 +473,12 @@ void __tasklet_hi_schedule(struct tasklet_struct *t)
 	t->next = NULL;
 	*__this_cpu_read(tasklet_hi_vec.tail) = t;
 	__this_cpu_write(tasklet_hi_vec.tail,  &(t->next));
-	raise_softirq_irqoff(HI_SOFTIRQ);
+	raise_softirq_irqoff(HI_SOFTIRQ); //helin: 触发高优先级的软中断 HI_SOFTIRQ
 	local_irq_restore(flags);
 }
 EXPORT_SYMBOL(__tasklet_hi_schedule);
 
-static __latent_entropy void tasklet_action(struct softirq_action *a)
+static __latent_entropy void tasklet_action(struct softirq_action *a) //helin: irq 数组的回调函数action
 {
 	struct tasklet_struct *list;
 
@@ -497,12 +498,15 @@ static __latent_entropy void tasklet_action(struct softirq_action *a)
 				if (!test_and_clear_bit(TASKLET_STATE_SCHED,
 							&t->state))
 					BUG();
+
 #ifdef CONFIG_HISI_BB
-				tasklet_hook((u64)(t->func), 0);
+				tasklet_hook((u64)(t->func), 0); //helin: huawei tasklet trace enter
 #endif
+				//helin: tasklet 类型的irq链表遍历执行
 				t->func(t->data);
+
 #ifdef CONFIG_HISI_BB
-				tasklet_hook((u64)(t->func), 1);
+				tasklet_hook((u64)(t->func), 1);  //helin: huawei tasklet trace exit
 #endif
 				tasklet_unlock(t);
 				continue;

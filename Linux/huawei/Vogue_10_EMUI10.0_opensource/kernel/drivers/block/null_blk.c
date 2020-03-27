@@ -1381,7 +1381,7 @@ static void null_request_fn(struct request_queue *q)
 		struct nullb_cmd *cmd = rq->special;
 
 		spin_unlock_irq(q->queue_lock);
-		null_handle_cmd(cmd);
+		null_handle_cmd(cmd); //helin
 		spin_lock_irq(q->queue_lock);
 	}
 }

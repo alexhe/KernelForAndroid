@@ -39,7 +39,7 @@ struct hmm;
  * allows the use of atomic double word operations on the flags/mapping
  * and lru list pointers also.
  */
-struct page {
+struct page { //helin. 2020-03-08
 	/* First double word block */
 	unsigned long flags;		/* Atomic flags, some possibly
 					 * updated asynchronously */
@@ -124,8 +124,8 @@ struct page {
 					    * allocator, this points to the
 					    * hosting device page map.
 					    */
-		struct {		/* slub per cpu partial pages */
-			struct page *next;	/* Next partial slab */
+		struct {		/* slub per cpu partial pages */ //helin
+			struct page *next;	/* Next partial slab */ //helin
 #ifdef CONFIG_64BIT
 			int pages;	/* Nr of partial slabs left */
 			int pobjects;	/* Approximate # of objects */
@@ -185,7 +185,7 @@ struct page {
 		spinlock_t ptl;
 #endif
 #endif
-		struct kmem_cache *slab_cache;	/* SL[AU]B: Pointer to slab */
+		struct kmem_cache *slab_cache;	/* SL[AU]B: Pointer to slab */ //helin
 	};
 
 #ifdef CONFIG_MEMCG
@@ -210,7 +210,8 @@ struct page {
 #ifdef LAST_CPUPID_NOT_IN_PAGE_FLAGS
 	int _last_cpupid;
 #endif
-}
+}//helin. end of page def.
+
 /*
  * The struct page can be forced to be double word aligned so that atomic ops
  * on double words work. The SLUB allocator can make use of such a feature.
@@ -275,7 +276,7 @@ struct vm_userfaultfd_ctx {};
  * space that has a special rule for the page-fault handlers (ie a shared
  * library, the executable area etc).
  */
-struct vm_area_struct {
+struct vm_area_struct { //helin. 2020-03-06
 	/* The first cache line has the info for VMA tree walking. */
 
 	unsigned long vm_start;		/* Our start address within vm_mm. */
@@ -283,7 +284,7 @@ struct vm_area_struct {
 					   within vm_mm. */
 
 	/* linked list of VM areas per task, sorted by address */
-	struct vm_area_struct *vm_next, *vm_prev;
+	struct vm_area_struct *vm_next, *vm_prev; //helin
 
 	struct rb_node vm_rb;
 
@@ -297,7 +298,7 @@ struct vm_area_struct {
 
 	/* Second cache line starts here. */
 
-	struct mm_struct *vm_mm;	/* The address space we belong to. */
+	struct mm_struct *vm_mm;	/* The address space we belong to. */ //helin
 	pgprot_t vm_page_prot;		/* Access permissions of this VMA. */
 	unsigned long vm_flags;		/* Flags, see mm.h. */
 
@@ -333,7 +334,8 @@ struct vm_area_struct {
 	/* Information about our backing store: */
 	unsigned long vm_pgoff;		/* Offset (within vm_file) in PAGE_SIZE
 					   units */
-	struct file * vm_file;		/* File we map to (can be NULL). */
+	//helin: map-file
+	struct file * vm_file;		/* File we map to (can be NULL). */ //helin
 	void * vm_private_data;		/* was vm_pte (shared mem) */
 
 	atomic_long_t swap_readahead_info;
@@ -365,8 +367,8 @@ struct kioctx_table;
 #ifdef CONFIG_BLK_DEV_THROTTLING
 struct blk_throtl_io_limit;
 #endif
-struct mm_struct {
-	struct vm_area_struct *mmap;		/* list of VMAs */
+struct mm_struct { //helin 2020-03-06
+	struct vm_area_struct *mmap;		/* list of VMAs */ //helin
 	struct rb_root mm_rb;
 	u64 vmacache_seqnum;                   /* per-thread vmacache */
 #ifdef CONFIG_MMU
@@ -383,7 +385,7 @@ struct mm_struct {
 #endif
 	unsigned long task_size;		/* size of task vm space */
 	unsigned long highest_vm_end;		/* highest vma end address */
-	pgd_t * pgd;
+	pgd_t * pgd; //helin: page-dir
 
 	/**
 	 * @mm_users: The number of users including userspace.
@@ -430,8 +432,11 @@ struct mm_struct {
 	unsigned long exec_vm;		/* VM_EXEC & ~VM_WRITE & ~VM_STACK */
 	unsigned long stack_vm;		/* VM_STACK */
 	unsigned long def_flags;
+	//helin: 代码段和数据段区间
 	unsigned long start_code, end_code, start_data, end_data;
+	//helin: heap 区间； stack开端
 	unsigned long start_brk, brk, start_stack;
+	//helin: env和arg参数区间
 	unsigned long arg_start, arg_end, env_start, env_end;
 
 	unsigned long saved_auxv[AT_VECTOR_SIZE]; /* for /proc/PID/auxv */

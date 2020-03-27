@@ -182,11 +182,12 @@ typedef unsigned short freelist_idx_t;
  * footprint.
  *
  */
-struct array_cache {
-	unsigned int avail;
-	unsigned int limit;
-	unsigned int batchcount;
+struct array_cache { //helin: 栈 序 LIFO
+	unsigned int avail; //helin:  当前cpu缓存还有的可用的对象缓存数量
+	unsigned int limit; //helin: 每cpu可以缓存对象的最大数量
+	unsigned int batchcount; //helin: 为空时候，可以从全局缓存批量转入的数量
 	unsigned int touched;
+	//helin: item
 	void *entry[];	/*
 			 * Must have this definition in here for the proper
 			 * alignment of array_cache. Also simplifies accessing
@@ -203,7 +204,7 @@ struct alien_cache {
  * Need this for bootstrapping a per node allocator.
  */
 #define NUM_INIT_LISTS (2 * MAX_NUMNODES)
-static struct kmem_cache_node __initdata init_kmem_cache_node[NUM_INIT_LISTS];
+static struct kmem_cache_node __initdata init_kmem_cache_node[NUM_INIT_LISTS]; //helin
 #define	CACHE_CACHE 0
 #define	SIZE_NODE (MAX_NUMNODES)
 
@@ -226,7 +227,7 @@ static int slab_early_init = 1;
 
 static void kmem_cache_node_init(struct kmem_cache_node *parent)
 {
-	INIT_LIST_HEAD(&parent->slabs_full);
+	INIT_LIST_HEAD(&parent->slabs_full); //helin
 	INIT_LIST_HEAD(&parent->slabs_partial);
 	INIT_LIST_HEAD(&parent->slabs_free);
 	parent->total_slabs = 0;
@@ -422,7 +423,7 @@ static inline unsigned int obj_to_index(const struct kmem_cache *cache,
 
 #define BOOT_CPUCACHE_ENTRIES	1
 /* internal cache of cache description objs */
-static struct kmem_cache kmem_cache_boot = {
+static struct kmem_cache kmem_cache_boot = { //helin
 	.batchcount = 1,
 	.limit = BOOT_CPUCACHE_ENTRIES,
 	.shared = 1,
@@ -1234,19 +1235,19 @@ static void __init set_up_node(struct kmem_cache *cachep, int index)
  * Initialisation.  Called after the page allocator have been initialised and
  * before smp_init().
  */
-void __init kmem_cache_init(void)
+void __init kmem_cache_init(void) //helin
 {
 	int i;
 
 	BUILD_BUG_ON(sizeof(((struct page *)NULL)->lru) <
 					sizeof(struct rcu_head));
-	kmem_cache = &kmem_cache_boot;
+	kmem_cache = &kmem_cache_boot; //helin: 哪里定义的?
 
 	if (!IS_ENABLED(CONFIG_NUMA) || num_possible_nodes() == 1)
 		use_alien_caches = 0;
 
 	for (i = 0; i < NUM_INIT_LISTS; i++)
-		kmem_cache_node_init(&init_kmem_cache_node[i]);
+		kmem_cache_node_init(&init_kmem_cache_node[i]); //helin
 
 	/*
 	 * Fragmentation resistance on low memory - only use bigger
@@ -3117,14 +3118,14 @@ static inline void *____cache_alloc(struct kmem_cache *cachep, gfp_t flags)
 	ac = cpu_cache_get(cachep);
 	if (likely(ac->avail)) {
 		ac->touched = 1;
-		objp = ac->entry[--ac->avail];
+		objp = ac->entry[--ac->avail]; //helin: if: 缓存有剩余，直接返回；
 
 		STATS_INC_ALLOCHIT(cachep);
 		goto out;
 	}
 
 	STATS_INC_ALLOCMISS(cachep);
-	objp = cache_alloc_refill(cachep, flags);
+	objp = cache_alloc_refill(cachep, flags); //helin: else: cpu缓存 没有剩余， 重新填充
 	/*
 	 * the 'ac' may be updated by cache_alloc_refill(),
 	 * and kmemleak_erase() requires its correct value.
@@ -3346,7 +3347,7 @@ __do_cache_alloc(struct kmem_cache *cache, gfp_t flags)
 		if (objp)
 			goto out;
 	}
-	objp = ____cache_alloc(cache, flags);
+	objp = ____cache_alloc(cache, flags); //helin: 某个大小的cache项上分配一个对象
 
 	/*
 	 * We may just have run out of memory on the local node.
@@ -3375,13 +3376,13 @@ slab_alloc(struct kmem_cache *cachep, gfp_t flags, unsigned long caller)
 	void *objp;
 
 	flags &= gfp_allowed_mask;
-	cachep = slab_pre_alloc_hook(cachep, flags);
+	cachep = slab_pre_alloc_hook(cachep, flags); //helin: pre hook
 	if (unlikely(!cachep))
 		return NULL;
 
 	cache_alloc_debugcheck_before(cachep, flags);
 	local_irq_save(save_flags);
-	objp = __do_cache_alloc(cachep, flags);
+	objp = __do_cache_alloc(cachep, flags); //helin: cache分配obj
 	local_irq_restore(save_flags);
 	objp = cache_alloc_debugcheck_after(cachep, flags, objp, caller);
 	prefetchw(objp);
@@ -3389,7 +3390,7 @@ slab_alloc(struct kmem_cache *cachep, gfp_t flags, unsigned long caller)
 	if (unlikely(flags & __GFP_ZERO) && objp)
 		memset(objp, 0, cachep->object_size);
 
-	slab_post_alloc_hook(cachep, flags, 1, &objp);
+	slab_post_alloc_hook(cachep, flags, 1, &objp); //helin: post hook
 	return objp;
 }
 
@@ -3536,7 +3537,7 @@ void ___cache_free(struct kmem_cache *cachep, void *objp,
 		}
 	}
 
-	ac->entry[ac->avail++] = objp;
+	ac->entry[ac->avail++] = objp; //helin: put to cpu-cache array 
 }
 
 /**
@@ -3712,11 +3713,15 @@ static __always_inline void *__do_kmalloc(size_t size, gfp_t flags,
 	struct kmem_cache *cachep;
 	void *ret;
 
+	//helin: kmalloc: 超过最大size就失败；64MB；
 	if (unlikely(size > KMALLOC_MAX_CACHE_SIZE))
 		return NULL;
+
+	//helin: 1. 找到size往上对齐后的cache数组中的item
 	cachep = kmalloc_slab(size, flags);
 	if (unlikely(ZERO_OR_NULL_PTR(cachep)))
 		return cachep;
+	//helin: 2. 对齐后的cache分配一个slab
 	ret = slab_alloc(cachep, flags, caller);
 
 	kasan_kmalloc(cachep, ret, size, flags);
@@ -3746,10 +3751,10 @@ EXPORT_SYMBOL(__kmalloc_track_caller);
  * Free an object which was previously allocated from this
  * cache.
  */
-void kmem_cache_free(struct kmem_cache *cachep, void *objp)
+void kmem_cache_free(struct kmem_cache *cachep, void *objp) //helin
 {
 	unsigned long flags;
-	cachep = cache_from_obj(cachep, objp);
+	cachep = cache_from_obj(cachep, objp); //helin. 合法性校验
 	if (!cachep)
 		return;
 
@@ -3757,7 +3762,7 @@ void kmem_cache_free(struct kmem_cache *cachep, void *objp)
 	debug_check_no_locks_freed(objp, cachep->object_size);
 	if (!(cachep->flags & SLAB_DEBUG_OBJECTS))
 		debug_check_no_obj_freed(objp, cachep->object_size);
-	__cache_free(cachep, objp, _RET_IP_);
+	__cache_free(cachep, objp, _RET_IP_); //helin. 真正释放free
 	local_irq_restore(flags);
 
 	trace_kmem_cache_free(_RET_IP_, objp);

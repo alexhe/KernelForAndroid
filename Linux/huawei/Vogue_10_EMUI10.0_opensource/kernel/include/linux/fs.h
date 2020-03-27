@@ -333,7 +333,7 @@ typedef struct {
 typedef int (*read_actor_t)(read_descriptor_t *, struct page *,
 		unsigned long, unsigned long);
 
-struct address_space_operations {
+struct address_space_operations { //helin: 页 的  读取 写入 操作指针
 	int (*writepage)(struct page *page, struct writeback_control *wbc);
 	int (*readpage)(struct file *, struct page *);
 
@@ -393,9 +393,9 @@ int pagecache_write_end(struct file *, struct address_space *mapping,
 				loff_t pos, unsigned len, unsigned copied,
 				struct page *page, void *fsdata);
 
-struct address_space {
-	struct inode		*host;		/* owner: inode, block_device */
-	struct radix_tree_root	page_tree;	/* radix tree of all pages */
+struct address_space { //helin: 文件inode下的pages管理者
+	struct inode		*host;		/* owner: inode, block_device */ //helin: 所属inode文件结点
+	struct radix_tree_root	page_tree;	/* radix tree of all pages */ //helin: 基数树根节点
 	spinlock_t		tree_lock;	/* and lock protecting it */
 	atomic_t		i_mmap_writable;/* count VM_SHARED mappings */
 	struct rb_root_cached	i_mmap;		/* tree of private and shared mappings */
@@ -405,7 +405,7 @@ struct address_space {
 	/* number of shadow or DAX exceptional entries */
 	unsigned long		nrexceptional;
 	pgoff_t			writeback_index;/* writeback starts here */
-	const struct address_space_operations *a_ops;	/* methods */
+	const struct address_space_operations *a_ops;	/* methods */ //helin 操作函数指针
 	unsigned long		flags;		/* error bits */
 	spinlock_t		private_lock;	/* for use by the address_space */
 	gfp_t			gfp_mask;	/* implicit gfp mask for allocations */
@@ -572,7 +572,7 @@ struct fsnotify_mark_connector;
  * the RCU path lookup and 'stat' data) fields at the beginning
  * of the 'struct inode'
  */
-struct inode {
+struct inode { //helin: 文件对应的inode结点
 	umode_t			i_mode;
 	unsigned short		i_opflags;
 	kuid_t			i_uid;
@@ -584,9 +584,9 @@ struct inode {
 	struct posix_acl	*i_default_acl;
 #endif
 
-	const struct inode_operations	*i_op;
+	const struct inode_operations	*i_op; //helin: inode操作函数指针
 	struct super_block	*i_sb;
-	struct address_space	*i_mapping;
+	struct address_space	*i_mapping; //helin: inode包含的各个页的管理-读写页
 
 #ifdef CONFIG_SECURITY
 	void			*i_security;
@@ -607,7 +607,7 @@ struct inode {
 	};
 	dev_t			i_rdev;
 	loff_t			i_size;
-	struct timespec		i_atime;
+	struct timespec		i_atime; //helin: 这些都是inode的元信息
 	struct timespec		i_mtime;
 	struct timespec		i_ctime;
 	spinlock_t		i_lock;	/* i_blocks, i_bytes, maybe i_size */
@@ -653,7 +653,7 @@ struct inode {
 #endif
 	const struct file_operations	*i_fop;	/* former ->i_op->default_file_ops */
 	struct file_lock_context	*i_flctx;
-	struct address_space	i_data;
+	struct address_space	i_data; //helin: 这个是干嘛? 
 	struct list_head	i_devices;
 	union {
 		struct pipe_inode_info	*i_pipe;

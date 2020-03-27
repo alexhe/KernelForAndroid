@@ -311,13 +311,13 @@ enum zone_watermarks {
 #define low_wmark_pages(z) (z->watermark[WMARK_LOW])
 #define high_wmark_pages(z) (z->watermark[WMARK_HIGH])
 
-struct per_cpu_pages {
+struct per_cpu_pages { //helin: Per-Cpu-Pages --> pcp
 	int count;		/* number of pages in the list */
 	int high;		/* high watermark, emptying needed */
 	int batch;		/* chunk size for buddy add/remove */
 
 	/* Lists of pages, one per migrate type stored on the pcp-lists */
-	struct list_head lists[MIGRATE_PCPTYPES];
+	struct list_head lists[MIGRATE_PCPTYPES]; //helin
 };
 
 struct per_cpu_pageset {
@@ -384,7 +384,7 @@ enum zone_type {
 	 * table entries on i386) for each page that the kernel needs to
 	 * access.
 	 */
-	ZONE_HIGHMEM,
+	ZONE_HIGHMEM, //helin
 #endif
 	ZONE_MOVABLE,
 #ifdef CONFIG_ZONE_DEVICE
@@ -419,7 +419,7 @@ struct zone {
 	int node;
 #endif
 	struct pglist_data	*zone_pgdat;
-	struct per_cpu_pageset __percpu *pageset;
+	struct per_cpu_pageset __percpu *pageset; //helin
 
 #ifndef CONFIG_SPARSEMEM
 	/*
@@ -435,11 +435,11 @@ struct zone {
 	/*
 	 * spanned_pages is the total pages spanned by the zone, including
 	 * holes, which is calculated as:
-	 * 	spanned_pages = zone_end_pfn - zone_start_pfn;
+	 * 	spanned_pages = zone_end_pfn - zone_start_pfn; --helin span: 跨度
 	 *
 	 * present_pages is physical pages existing within the zone, which
 	 * is calculated as:
-	 *	present_pages = spanned_pages - absent_pages(pages in holes);
+	 *	present_pages = spanned_pages - absent_pages(pages in holes);//helin 排除空洞页
 	 *
 	 * managed_pages is present pages managed by the buddy system, which
 	 * is calculated as (reserved_pages includes pages allocated by the
@@ -473,7 +473,7 @@ struct zone {
 	 * adjust_managed_page_count() should be used instead of directly
 	 * touching zone->managed_pages and totalram_pages.
 	 */
-	unsigned long		managed_pages;
+	unsigned long		managed_pages; //helin...
 	unsigned long		spanned_pages;
 	unsigned long		present_pages;
 
@@ -661,10 +661,13 @@ extern struct page *mem_map;
  * per-zone basis.
  */
 struct bootmem_data;
+//helin: node struct...
 typedef struct pglist_data {
-	struct zone node_zones[MAX_NR_ZONES];
-	struct zonelist node_zonelists[MAX_ZONELISTS];
-	int nr_zones;
+	//helin: 包含的zones...
+	struct zone node_zones[MAX_NR_ZONES]; //helin: 节点中的各个内存域
+	struct zonelist node_zonelists[MAX_ZONELISTS]; //helin: 备用节点及其内存域列表
+	int nr_zones; //helin
+
 #ifdef CONFIG_FLAT_NODE_MEM_MAP	/* means !SPARSEMEM */
 	struct page *node_mem_map;
 #ifdef CONFIG_PAGE_EXTENSION
@@ -695,7 +698,7 @@ typedef struct pglist_data {
 	unsigned long node_present_pages; /* total number of physical pages */
 	unsigned long node_spanned_pages; /* total size of physical page
 					     range, including holes */
-	int node_id;
+	int node_id; //helin node id.
 	wait_queue_head_t kswapd_wait;
 	wait_queue_head_t pfmemalloc_wait;
 	struct task_struct *kswapd;	/* Protected by
@@ -771,7 +774,7 @@ typedef struct pglist_data {
 	/* Per-node vmstats */
 	struct per_cpu_nodestat __percpu *per_cpu_nodestats;
 	atomic_long_t		vm_stat[NR_VM_NODE_STAT_ITEMS];
-} pg_data_t;
+} pg_data_t; //helin
 
 #define node_present_pages(nid)	(NODE_DATA(nid)->node_present_pages)
 #define node_spanned_pages(nid)	(NODE_DATA(nid)->node_spanned_pages)

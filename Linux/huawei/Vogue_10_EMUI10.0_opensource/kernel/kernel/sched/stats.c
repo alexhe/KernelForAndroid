@@ -133,7 +133,7 @@ static const struct file_operations proc_schedstat_operations = {
 
 static int __init proc_schedstat_init(void)
 {
-	proc_create("schedstat", 0, NULL, &proc_schedstat_operations);
+	proc_create("schedstat", 0, NULL, &proc_schedstat_operations); //helin: /proc/schedstat ?
 	return 0;
 }
 subsys_initcall(proc_schedstat_init);
